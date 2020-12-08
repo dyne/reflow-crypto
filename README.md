@@ -22,12 +22,14 @@ Upon succesful verification, the Issuer will emit a credential for zero-knowledg
 sequenceDiagram
   participant A as Alice
   participant I as Issuer
-  A->>A: sk, pk = keygen()
-  A->>A: cred = credgen()
+  participant P as Public
+  I->>P: Issuer verifier (V)
+  A->>A: sk, pk = keygen(), cred = credgen()
   A->>I: verification request: pk, cred
   I->>A: challenge = crypt(pk, message)
   A->>I: message = decrypt(sk, challenge)
   I->>A: vcred = sign(cred) - proof of possession
+  I->>P: pk
 ```
 
 Any participant is supposed go through setup to obtain proof-of-possession, this is a necessary measure against rogue-signature attacks and is the only centralized process in this scheme.
@@ -41,14 +43,12 @@ The Public space (a DLT) can prove the authenticity of signatures submitted by c
 ```mermaid
 sequenceDiagram
     participant A as Alice
-    participant B as Bob
     participant P as Public
-    A->>A: Σ = sign(sk, doc)
-    A->>A: π = makeproof(vcred)
+    participant B as Bob
+    A->>A: Σ = sign(sk, doc), π = makeproof(vcred)
     A->>P: doc-id, Σ, π
     P->>P: prove(V, π) => aggregate(doc-id, Σ)
-    B->>B: Σ = sign(sk, doc)
-    B->>B: π = makeproof(vcred)
+    B->>B: Σ = sign(sk, doc), π = makeproof(vcred)
     B->>P: doc-id, Σ, π
     P->>P: prove(V, π) => aggregate(doc-id, Σ)
 ```
