@@ -3,9 +3,10 @@ sequenceDiagram
   participant I as Issuer
   participant P as Public
   I->>P: Issuer verifier (V)
-  A->>A: sk, pk = keygen(), cred = credgen()
-  A->>I: verification request: pk, cred
-  I->>A: challenge = crypt(pk, message)
+  A->>A: sk, PK = keygen(), Lambda = prepare_blind_sign(ck)
+  A->>I: credential signature request: PK, Lambda
+  I->>A: challenge = crypt(PK, message)
   A->>I: message = decrypt(sk, challenge)
-  I->>A: vcred = sign(cred) - proof of possession
-  I->>P: pk
+  I->>A: SigmaTilde = sign(Lambda) -- proof of possession
+  A->>A: Sigma = aggregate_credential(ck, SigmaTilde)
+  I->>P: PK + PKn -- aggregated PKs

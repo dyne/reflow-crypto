@@ -1,5 +1,9 @@
 \documentclass{article}
 
+% Roman numbers for sections
+\renewcommand{\thesection}{\Roman{section}} 
+\renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+
 
 
 \usepackage{arxiv}
@@ -124,31 +128,31 @@ Our evaluationof the Multiparty primities shows very promising
 results. Verifiction takes about 10ms,  while signing a document is
 about 3 times faster. 
 
-\subsection{Contributions}
-
-This paper makes three key contributions:
+\textbf{Contributions:} This paper makes three key contributions:
 
 \begin{itemize}
 
+\item We describe the signature scheme underlying Multidarkroom,
+  including how key generation, signing and verification operate
+  (Section \ref{sec:signature}). The scheme is an application of the
+  BLS signature scheme \citep{asiacrypt-bls} fitted with features to
+  grant the unlinkability of signatures and to secure it against
+  rogue-key attacks.
+
 \item We describe the credential scheme underlying Multidarkroom,
   including how key generation, issuance, aggregation and verification
-  of credentials operate (Section II). The scheme is an application of
-  the Coconut credential scheme \citep{coconut-2018} that is general
-  purpose and can be scaled to a fully distributed threshold issuance
-  that is re-randomizable.
+  of credentials operate (Section \ref{sec:credential}). The scheme is
+  an application of the Coconut credential scheme \citep{coconut-2018}
+  that is general purpose and can be scaled to a fully distributed
+  threshold issuance that is re-randomizable.
 
-\item We describe the signature scheme underlying Multidarkroom,
-  including how key generation, signing and verification operate (
-  \ref{sec:signature}). The scheme is an application of the BLS
-  signature scheme [] fitted with features to grant the unlinkability
-  of signatures and to secure it against rogue-key attacks.
-
-\item We use Multidarkroom to implement a Zencode scenario to be
-  executed on and off-chain by the Zenroom VM, complete with functions
-  for public credential issuance, signature session creation and
-  multi-party non-interactive signing (Section III). We evaluate the
-  performance and cost of this implementation on on-site and on-line
-  platforms leveraging end-to-end encryption (Section VI).
+\item We implement a Zencode scenario of Multidarkroom to be executed
+  on and off-chain by the Zenroom VM, complete with functions for
+  public credential issuance, signature session creation and
+  multi-party non-interactive signing (Section
+  \ref{sec:implementation}). We evaluate the performance and cost of
+  this implementation on on-site and on-line platforms leveraging
+  end-to-end encryption (Section \ref{sec:evaluation}).
 
 \end{itemize}
 
@@ -157,9 +161,6 @@ This paper makes three key contributions:
 \label{sec:signature}
 
 \lipsum[1]
-
-\subsection{Vulnerability}
-\lipsum[2]
 
 % \begin{equation}
 % 	\xi _{ij}(t)=P(x_{t}=i,x_{t+1}=j|y,v,w;\theta)= {\frac {\alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}{\sum _{i=1}^{N} \sum _{j=1}^{N} \alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}}
@@ -171,6 +172,7 @@ This paper makes three key contributions:
 \lipsum[3]
 
 \section{Implementation}
+\label{sec:implementation}
 
 In this section we illustrate our implementation of Multidarkroom
 keygen, sign and verify operations outlining for each:
@@ -181,8 +183,38 @@ keygen, sign and verify operations outlining for each:
   \item the Zencode statements
 \end{enumerate}
 
+In addition to the above, a Setup operation will be briefly
+illustrated without the sequence diagram, as it includes the local
+creation of a keypair for the Issuer who will validate the
+credentials.
 
-\subsection{Keygen}
+\textbf{Setup:} Generate the Issuer keys for credential signature
+
+\begin{lstlisting}[style=lua]
+ x = INT.random()
+ y = INT.random()
+ sk = { x = x,
+        y = y  }
+ vk = { alpha = G2 * x,
+        beta  = G2 * y  }
+ return { sign = sk,
+          verify = vk }
+\end{lstlisting}
+
+Executed by the Zencode utterance:
+
+\textbf{When I create the issuer keypair}
+
+It will create a new \emph{issuer keypair} that can be used to sign
+each new \emph{credential request}. Its public member \emph{.verify}
+should be public and know to anyone willing to verify the credentials
+of signers.
+
+\textbf{Keygen:} Generate a credential request and have it signed by
+an Issuer, as well generate a BLS keypair used to sign documents. This
+procedure will generate private keys that should not be comunicated,
+as well public BLS keys that can be aggregated for signature
+verification.
 
 \begin{figure}
   \caption{Keygen process sequence diagram}
@@ -190,7 +222,52 @@ keygen, sign and verify operations outlining for each:
   \includegraphics[width=0.8\textwidth]{keygen-seq}
 \end{figure}
 
-\subsection{Sign}
+The following Zenroom implementation makes use of the Coconut
+built-in extension for zero-knowledge proof credentials.
+
+\begin{lstlisting}[style=lua]
+ZK = require_once('crypto_abc')
+issuer = ZK.issuer_keygen() -- setup
+sk = INT.random() -- signing key
+ck = INT.random() -- credential key
+PK = G2 * sk     -- signature verifier
+Lambda = ZK.prepare_blind_sign(ck * G1, ck)
+SigmaTilde = ZK.blind_sign(issuer.sign, Lambda)
+Sigma = ZK.aggregate_creds(ck, {SigmaTilde})
+\end{lstlisting}
+
+This code is executed in multiple steps by the Zencode utterances:
+
+\begin{enumerate}
+
+\item \textbf{When I create the credential keypair}
+
+  will create a new \emph{credential keypair} object containing
+  members \emph{public} (ECP) and \emph{private} (BIG).
+
+\item \textbf{When I create the credential request}
+
+  will use the \emph{credential keypair} to create a new
+  \emph{credential request} complex schema object for ZK proof.
+
+\item \textbf{When I create the credential signature}
+
+  will be executed by the Issuer after the proof-of-possession
+  challenge is positive (exchange and confirmation of an encrypted
+  message using BLS public keys) to sign the credential.
+
+\item \textbf{When I create the credentials}
+
+  will aggregate one or more \emph{credential signature} (SigmaTilde)
+  together with the \emph{private} member of the \emph{credential
+    keypair} and finally create \emph{credentials} capable of
+  producing Zero-Knowledge proofs of possession.
+
+\end{enumerate}
+
+
+
+\textbf{Sign:}
 
 \begin{figure}
   \caption{Signing process sequence diagram}
@@ -198,7 +275,7 @@ keygen, sign and verify operations outlining for each:
   \includegraphics[width=0.8\textwidth]{sign-seq}
 \end{figure}
 
-\subsection{Verify}
+\textbf{Verify:}
 
 \begin{figure}
   \caption{Verification process sequence diagram}
@@ -296,6 +373,7 @@ assert( ECP2.miller(PM, UID)
 \end{lstlisting}
 
 \section{Evaluation}
+\label{sec:evaluation}
 
 \lipsum[5]
 
