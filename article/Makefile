@@ -1,12 +1,17 @@
-biblio:
-	latex multidarkroom
+# run latex enough times to iterate over bibtex
+all:
+	pdflatex multidarkroom
 	bibtex multidarkroom
-	@echo "DONE"
-	@echo "------------------------------------------------"
-	@echo "Copy the multidarkroom.bbl file content to multidarkroom.tex into the \\\begin{thebibliography} command."
-	@echo "Comment out the \\\bibliography{references} command in template.tex."
-	@echo "------------------------------------------------"
-
-pdf:
+	pdflatex multidarkroom
 	pdflatex multidarkroom
 
+
+# docker pull minlag/mermaid-cli
+mermaid = docker run --rm -v=${PWD}:/app/data minlag/mermaid-cli -w 2048 -H 1536 -i data/$(1) -o data/$(2)
+mermaid:
+	$(call mermaid,keygen.mmd,keygen-seq.png)
+	$(call mermaid,sign.mmd,sign-seq.png)
+	$(call mermaid,verify.mmd,verify-seq.png)
+
+clean:
+	rm -f *blg *bbl *dvi *pdf *toc *out *aux *log *-seq.png

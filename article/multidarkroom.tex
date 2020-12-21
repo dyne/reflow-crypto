@@ -31,16 +31,16 @@
 %\date{September 9, 1985}	% Here you can change the date presented in the paper title
 %\date{} 					% Or removing it
 
-\author{Denis Roio \\
+\author{
+    Denis Roio \\
 	Dyne.org foundation \\
 	Amsterdam, 1013AK \\
 	\texttt{J@Dyne.org} \\
-	%% examples of more authors
-	\And
+    \And
 	Alberto Ibrisevic \\
 	Laboratory of Cryptography\\
-	Trento University\\
-	\texttt{Alberto.Ibrisevic@studenti.unitn.it} \\
+	Trento University (stage)\\
+	\texttt{bettowski@dyne.org} \\
     \And
     Andrea D'Intino \\
     Dyne.org foundation \\
@@ -90,6 +90,7 @@ pdfkeywords={Cryptography, signatures, zero-knowledge, multi-party, BLS, Coconut
 
 
 \section{Introduction}
+
 Multi-party computation [] applied to the signing process [] allows
 the issuance of signatures without requiring any of the participating
 parties to disclose secret signing keys to each other, nor requires
@@ -98,8 +99,8 @@ signatures. However, established schemes have shortcomings. Some do
 not provide the necessary efficiency, re-randomization, or blind
 issuance properties necessary to implement the privacy preserving
 features necessary for the application to trustless distributed
-systems. Other schemes are prone to rogue-signature attacks [] in the
-absence of authentication methods to grant that signatures are
+systems. Other schemes are prone to rogue-key attacks \citep{ietf-bls}
+in the absence of authentication methods to grant that signatures are
 produced by legitimate key holders.
 
 The lack of efficient and privacy-preserving signature schemes impacts
@@ -132,15 +133,15 @@ This paper makes three key contributions:
 \item We describe the credential scheme underlying Multidarkroom,
   including how key generation, issuance, aggregation and verification
   of credentials operate (Section II). The scheme is an application of
-  the Coconut credential scheme [] that is general purpose and can be
-  scaled to a fully distributed threshold issuance that is
-  re-randomizable.
+  the Coconut credential scheme \citep{coconut-2018} that is general
+  purpose and can be scaled to a fully distributed threshold issuance
+  that is re-randomizable.
 
 \item We describe the signature scheme underlying Multidarkroom,
   including how key generation, signing and verification operate (
   \ref{sec:signature}). The scheme is an application of the BLS
   signature scheme [] fitted with features to grant the unlinkability
-  of signatures and to secure it against rogue-signature attacks.
+  of signatures and to secure it against rogue-key attacks.
 
 \item We use Multidarkroom to implement a Zencode scenario to be
   executed on and off-chain by the Zenroom VM, complete with functions
@@ -169,9 +170,43 @@ This paper makes three key contributions:
 
 \lipsum[3]
 
-\section{Scenario}
+\section{Implementation}
 
-\lipsum[4]
+In this section we illustrate our implementation of Multidarkroom
+keygen, sign and verify operations outlining for each:
+
+\begin{enumerate}
+  \item the communication sequence diagram
+  \item the Zenroom code (Lua dialect)
+  \item the Zencode statements
+\end{enumerate}
+
+
+\subsection{Keygen}
+
+\begin{figure}
+  \caption{Keygen process sequence diagram}
+  \centering
+  \includegraphics[width=0.8\textwidth]{keygen-seq}
+\end{figure}
+
+\subsection{Sign}
+
+\begin{figure}
+  \caption{Signing process sequence diagram}
+  \centering
+  \includegraphics[width=0.8\textwidth]{sign-seq}
+\end{figure}
+
+\subsection{Verify}
+
+\begin{figure}
+  \caption{Verification process sequence diagram}
+  \centering
+  \includegraphics[width=0.8\textwidth]{verify-seq}
+\end{figure}
+
+
 
 \begin{lstlisting}[style=lua]
 
@@ -266,35 +301,11 @@ assert( ECP2.miller(PM, UID)
 
 \section{Bibliography}
 
-\lipsum[6]
-
-
 \bibliographystyle{unsrtnat}
-\bibliography{references}  %%% Uncomment this line and comment out the ``thebibliography'' section below to use the external .bib file (using bibtex) .
 
-%%% Uncomment this section and comment out the \bibliography{references} line above to use inline references.
-% \begin{thebibliography}{1}
+\bibliography{references}
 
-% 	\bibitem{kour2014real}
-% 	George Kour and Raid Saabne.
-% 	\newblock Real-time segmentation of on-line handwritten arabic script.
-% 	\newblock In {\em Frontiers in Handwriting Recognition (ICFHR), 2014 14th
-% 			International Conference on}, pages 417--422. IEEE, 2014.
 
-% 	\bibitem{kour2014fast}
-% 	George Kour and Raid Saabne.
-% 	\newblock Fast classification of handwritten on-line arabic characters.
-% 	\newblock In {\em Soft Computing and Pattern Recognition (SoCPaR), 2014 6th
-% 			International Conference of}, pages 312--318. IEEE, 2014.
-
-% 	\bibitem{hadash2018estimate}
-% 	Guy Hadash, Einat Kermany, Boaz Carmeli, Ofer Lavi, George Kour, and Alon
-% 	Jacovi.
-% 	\newblock Estimate and replace: A novel approach to integrating deep neural
-% 	networks with existing applications.
-% 	\newblock {\em arXiv preprint arXiv:1804.09028}, 2018.
-
-% \end{thebibliography}
 
 % \subsection{}
 % Citations use \verb+natbib+. The documentation may be found at

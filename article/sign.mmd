@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant A as Alice
+    participant P as Public
+    participant B as Bob
+    A->>A: Σ = sign(sk, doc), π = makeproof(vcred)
+    A->>P: doc-id, Σ, π
+    P->>P: prove(V, π) => aggregate(doc-id, Σ)
+    B->>B: Σ = sign(sk, doc), π = makeproof(vcred)
+    B->>P: doc-id, Σ, π
+    P->>P: prove(V, π) => aggregate(doc-id, Σ)

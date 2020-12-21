@@ -1,0 +1,7 @@
+sequenceDiagram
+    participant P as Public
+    participant N as Node
+    P->>N: V = Issuer verifier
+    P->>N: PK = pk1 + pk2
+    N->>N: verify_proof()
+

@@ -1,0 +1,11 @@
+sequenceDiagram
+  participant A as Alice
+  participant I as Issuer
+  participant P as Public
+  I->>P: Issuer verifier (V)
+  A->>A: sk, pk = keygen(), cred = credgen()
+  A->>I: verification request: pk, cred
+  I->>A: challenge = crypt(pk, message)
+  A->>I: message = decrypt(sk, challenge)
+  I->>A: vcred = sign(cred) - proof of possession
+  I->>P: pk
