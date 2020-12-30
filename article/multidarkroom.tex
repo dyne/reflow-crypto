@@ -1,11 +1,9 @@
-\documentclass{article}
+\documentclass[twocolumn]{article}
 \pdfoutput=1
 
 % Roman numbers for sections
 \renewcommand{\thesection}{\Roman{section}} 
 \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
-
-
 
 \usepackage{arxiv}
 
@@ -15,6 +13,9 @@
 \usepackage{url}            % simple URL typesetting
 \usepackage{booktabs}       % professional-quality tables
 \usepackage{amsmath}
+\usepackage{enumitem}
+\setlist[itemize]{align=parleft,left=0pt..1em}
+\setlist[enumerate]{align=parleft,left=0pt..1em}
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
@@ -23,6 +24,7 @@
 \usepackage{natbib}
 \usepackage{doi}
 \usepackage{listings,xcolor}
+
 \lstdefinestyle{lua}{
   language=[5.3]Lua,
   basicstyle=\ttfamily,
@@ -30,7 +32,6 @@
   stringstyle=\color{blue},
   commentstyle=\color{black!50}
 }
-
 
 \title{Multidarkroom}
 
@@ -63,18 +64,18 @@
   Application to Distributed Ledgers}
 \renewcommand{\shorttitle}{\textit{Multidarkroom}}
 
-%%% Add PDF metadata to help others organize their library
-%%% Once the PDF is generated, you can check the metadata with
-%%% $ pdfinfo template.pdf
-
 \hypersetup{
-pdftitle={Multidarkroom - Zero-knowledge proof secured BLS multi-signatures},
-pdfsubject={cs.CR},
-pdfauthor={Denis Roio, Alberto Ibrisevic, Andrea D'Intino},
-pdfkeywords={Cryptography, signatures, zero-knowledge, multi-party, BLS, Coconut},
+  pdftitle={Multidarkroom - Zero-knowledge proof secured BLS multi-signatures},
+  pdfsubject={cs.CR},
+  pdfauthor={Denis Roio, Alberto Ibrisevic, Andrea D'Intino},
+  pdfkeywords={Cryptography, signatures, zero-knowledge, multi-party, BLS, Coconut},
 }
 
 \begin{document}
+
+\twocolumn[
+  \begin{@twocolumnfalse}
+
 \maketitle
 
 \begin{abstract}
@@ -90,9 +91,11 @@ pdfkeywords={Cryptography, signatures, zero-knowledge, multi-party, BLS, Coconut
   longest time to compute.
 \end{abstract}
 
+\vspace{2cm}
 
-% keywords can be removed
-% \keywords{First keyword \and Second keyword \and More}
+ \end{@twocolumnfalse}
+]
+
 
 
 \section{Introduction}
@@ -264,13 +267,13 @@ verification.
 \begin{figure}
   \caption{Keygen process sequence diagram}
   \centering
-  \includegraphics[width=0.8\textwidth]{keygen-seq}
+  \includegraphics[width=0.4\textwidth]{keygen-seq}
 \end{figure}
 
 The following Zenroom implementation makes use of the Coconut
 built-in extension for zero-knowledge proof credentials.
 
-\begin{lstlisting}[style=lua]
+\begin{lstlisting}[basicstyle=\tiny,style=lua]
 ZK = require_once('crypto_abc')
 issuer = ZK.issuer_keygen() -- setup
 sk = INT.random() -- signing key
@@ -317,7 +320,7 @@ This code is executed in multiple steps by the Zencode utterances:
 \begin{figure}
   \caption{Signing process sequence diagram}
   \centering
-  \includegraphics[width=0.8\textwidth]{sign-seq}
+  \includegraphics[width=0.4\textwidth]{sign-seq}
 \end{figure}
 
 \textbf{Verify:}
@@ -325,7 +328,7 @@ This code is executed in multiple steps by the Zencode utterances:
 \begin{figure}
   \caption{Verification process sequence diagram}
   \centering
-  \includegraphics[width=0.8\textwidth]{verify-seq}
+  \includegraphics[width=0.4\textwidth]{verify-seq}
 \end{figure}
 
 
