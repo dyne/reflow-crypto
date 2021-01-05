@@ -213,14 +213,20 @@ If the request is correct, then we will have that
 \varphi(\widehat{A}_w,\widehat{B}_w,\widehat{C}_w) = \varphi(A_w,B_w,C_w) = c_m,
 \]
 and verification is thus complete, meaning that the verifier has right to believe that the prover actually owns the secret attribute $c_k$ associated to the public variable $\gamma$ and that consequently has produced a valid commitment $c$ and (El-Gamal) encryption $s$; in other words,
-\[
-\pi_s = \text{NIZK}\{(c_k, m, r, k): \gamma = c_k\cdot G, \text{ } c = r\cdot G_1 + m\cdot HS,\text{ } s = (k \cdot G_1, k\cdot \gamma + m\cdot c), \text{ } \phi(m)=1\}
-\]
+\begin{align*}
+\pi_s = \text{NIZK}\{(c_k, m, r, k): \\
+\gamma = c_k\cdot G, \\
+\text{ } c = r\cdot G_1 + m\cdot HS, \\
+\text{ } s = (k \cdot G_1, k\cdot \gamma + m\cdot c), \\
+\text{ } \phi(m)=1\}
+\end{align*}
 
 \textbf{TODO: variante proof per} \verb!prove_sign_creds!
 
 \section{Implementation}
 \label{sec:implementation}
+
+\lstset{basicstyle=\ttfamily\scriptsize, breaklines=true}
 
 In this section we illustrate our implementation of Multidarkroom
 keygen, sign and verify operations outlining for each:
@@ -279,9 +285,12 @@ issuer = ZK.issuer_keygen() -- setup
 sk = INT.random() -- signing key
 ck = INT.random() -- credential key
 PK = G2 * sk     -- signature verifier
-Lambda = ZK.prepare_blind_sign(ck * G1, ck)
-SigmaTilde = ZK.blind_sign(issuer.sign, Lambda)
-Sigma = ZK.aggregate_creds(ck, {SigmaTilde})
+Lambda =
+ ZK.prepare_blind_sign(ck * G1, ck)
+SigmaTilde =
+ ZK.blind_sign(issuer.sign, Lambda)
+Sigma =
+ ZK.aggregate_creds(ck, {SigmaTilde})
 \end{lstlisting}
 
 This code is executed in multiple steps by the Zencode utterances:
