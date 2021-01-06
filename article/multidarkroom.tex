@@ -16,6 +16,7 @@
 \usepackage{enumitem}
 \setlist[itemize]{align=parleft,left=0pt..1em}
 \setlist[enumerate]{align=parleft,left=0pt..1em}
+\usepackage[font=scriptsize]{caption}
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
@@ -259,8 +260,8 @@ In this section we illustrate our implementation of Multidarkroom
 keygen, sign and verify operations outlining for each:
 
 \begin{enumerate}
-  \item the communication sequence diagram
-  \item the Zenroom code (Lua dialect)
+  \item the communication sequence diagram (figure)
+  \item the Zenroom code (Lua dialect script)
   \item the Zencode statements
 \end{enumerate}
 
@@ -297,11 +298,24 @@ procedure will generate private keys that should not be comunicated,
 as well public BLS keys that can be aggregated for signature
 verification.
 
+Figure~\ref{fig:keygen} illustrates how this process consists of two
+different function calls: $keygen$ to create an ElGamal keypair and
+$prepareBlindSign$ to generate a Coconut credential request. An
+interactive exchange takes place between the Signer and the Issuer
+that verifies the possession of the secret ElGamal key and signs a
+credential to witness this condition.
+
 \begin{figure}
   \caption{Keygen process sequence diagram}
+  \label{fig:keygen}
   \centering
-  \includegraphics[width=0.4\textwidth]{keygen-seq}
+  \includegraphics[width=0.5\textwidth]{keygen-seq}
 \end{figure}
+
+The public key of the Issuer which is used to sign the credential
+should have been public and known by the Signer at the beginning of
+the keygen process, while at the end of this process the public
+ElGamal key should be published, i.e. on a distributed ledger.
 
 The following Zenroom implementation makes use of the Coconut
 built-in extension for zero-knowledge proof credentials.
@@ -465,7 +479,7 @@ assert( ECP2.miller(PM, UID)
 
 \bibliography{references}
 
-
+\listoffigures
 
 % \subsection{}
 % Citations use \verb+natbib+. The documentation may be found at
