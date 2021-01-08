@@ -248,8 +248,57 @@ The new objects $\theta$ and $\zeta$ are derived as follows:
     \end{align*}
     with $\phi'$ being a predicate which is true on $m$, while $\zeta$ is simply the scalar multiplication $m\cdot H$.
 \end{itemize}
-
-\textbf{TODO: how to build $\pi_v$}
+Building the proof $\pi_v$ requires similar steps as seen for $\pi_s$, in fact we create three commitment values $A_w, B_w, C_w$ defined as
+\begin{align*}
+    A_w &= \alpha + w_m\cdot \beta + w_r \cdot G_2 \\
+    B_w &= w_r\cdot c' \\
+    C_w &= w_m\cdot H
+\end{align*}
+where $w_m, w_r$ are fresh generated nonces; then we set the challenge as the computation of $c_m=\varphi(\{A_w,B_w,C_w\})$ with the related responses 
+\begin{align*}
+    r_m &= w_m - mc \\
+    r_r &= w_r - rc
+\end{align*}
+The values of $r_m$ and $r_r$ are stored inside $\pi_v$ which will be then sent through $\theta$ (together with $\zeta$) from the prover to the verifier. In order to check that the user has legitimately generated the proof and at the same time is the owner of the credential the following steps must be made:
+\begin{itemize}
+    \item[1.] extracting $\kappa, \nu, \pi_v$ (which is $(r_m,r_r, c_m))$ from $\theta$;
+    \item[2.] reconstructing the commitments $A_w, B_w, C_w$ as
+    \begin{align*}
+        \widehat{A}_w &= c_m\cdot \kappa + r_r\cdot G_2 + (1 - c_m) \cdot\alpha + r_m \cdot \beta \\
+        \widehat{B}_w &= r_r\cdot c' + c_m\cdot \nu \\
+        \widehat{C}_w &= r_m\cdot H + c_m\cdot \zeta
+    \end{align*}
+    \item[3.] checking either that
+    \[
+    \varphi(\{\widehat{A}_w,\widehat{B}_w,\widehat{C}_w\}) = \varphi(\{A_w,B_w,C_w\}) = c_m,
+    \]
+    that $c' \ne O$, the point at infinity, and that
+    \[
+    e(\kappa, c') = e(G_2, s' + \nu)
+    \]
+    where $e$ is the Miller pairing function defined as
+    \[
+    e: E_T \times E \to \mathbb{F}_{p^{12}}
+    \]
+    (\textbf{probabile che quest'ultima definizione la scrivero nella sezione 2})
+\end{itemize}
+Actually the predicate $\phi$ in the definition of $pi_v$ can be thought as performing steps 2. and 3. and, if any of these fails the protocol will abort returning a failure, otherwise verification passes and the user can finally produce the signature.\\
+\paragraph{Proof of the verification algorithms.} We now show for the proof $\pi_s$ that actually by using the responses $r_m, r_k$ and $r_r$, together with $c_m$ and the other parameters inside $\lambda$, i.e. $s=(a,b), c$ and $\gamma$, using also the hard coded point $HS$, it is possible to reconstruct the commitments $A_w, B_w, C_w$:
+\begin{align*}
+    \widehat{A}_w   &= c_m\cdot a + r_k\cdot G_1 = c_m k \cdot G_1 + r_k \cdot G_1 \\
+                    &= (c_m k + r_k)\cdot G_1 = (c_m k + w_k - c_m k)\cdot G_1 \\
+                    &= w_k\cdot G_1 = A_w \\
+    \widehat{B}_w   &= c_m\cdot b + r_k\cdot \gamma + r_m\cdot c \\
+                    &= c_m\cdot (k\cdot \gamma + m\cdot c) + r_k\cdot\gamma + r_m\cdot c \\
+                    &= (c_m k + r_k) \cdot\gamma + (c_m m + r_m\cdot c) \\
+                    &= (c_m k + w_k - c_m k ) \cdot\gamma + (c_m m + w_m - c_m m)\cdot c) \\
+                    &= w_k\cdot\gamma + w_m\cdot c = B_w \\
+    \widehat{C}_w   &= c_m\cdot c + r_r\cdot G_1 + r_m\cdot HS = c_m\cdot (r\cdot G_1 +                     m\cdot HS) + r_r\cdot G_1 + r_m\cdot HS \\
+                    &= (c_m r + r_r) G_1 + (c_m m + r_m) HS \\
+                    &= (c_m r + w_r - c_m r)\cdot G_1 + (c_m m + w_m - c_m m)\cdot HS \\
+                    &= w_r \cdot G_1 + w_m\cdot HS = C_w
+\end{align*}
+\textbf{TODO: proof della seconda verifica}
 
 \section{Implementation}
 \label{sec:implementation}
