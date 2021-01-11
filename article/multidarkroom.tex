@@ -105,13 +105,13 @@ Multi-party computation [] applied to the signing process [] allows
 the issuance of signatures without requiring any of the participating
 parties to disclose secret signing keys to each other, nor requires
 the presence of a trusted third-party to receive them and compose the
-signatures. However, established schemes have shortcomings. Some do
-not provide the necessary efficiency, re-randomization, or blind
-issuance properties necessary to implement the privacy preserving
-features necessary for the application to trustless distributed
-systems. Other schemes are prone to rogue-key attacks \citep{ietf-bls}
-in the absence of authentication methods to grant that signatures are
-produced by legitimate key holders.
+signatures. However, established schemes have shortcomings. Existing
+protocols do not provide the necessary efficiency, re-randomization or
+blind issuance properties necessary for the application to trustless
+distributed systems. Those managing to implement such privacy
+preserving features are prone to rogue-key attacks \citep{ietf-bls}
+since they cannot grant that signatures are produced by legitimate key
+holders.
 
 The lack of efficient and privacy-preserving signature schemes impacts
 distributed ledger platforms that support 'smart contracts' as well
@@ -130,9 +130,9 @@ autorities, the attribute showing and verification O(1) in terms of
 both cryptographic computations and communication of cryptographic
 material, irrespective of the number of authorities.
 
-Our evaluationof the Multiparty primities shows very promising
-results. Verifiction takes about 10ms,  while signing a document is
-about 3 times faster. 
+Our evaluation of the Multiparty primities shows very promising
+results. Verification takes about 10ms, while signing a document is
+about 3 times faster.
 
 \textbf{Contributions:} This paper makes three key contributions:
 
@@ -167,10 +167,6 @@ about 3 times faster.
 \label{sec:signature}
 
 \lipsum[1]
-
-% \begin{equation}
-% 	\xi _{ij}(t)=P(x_{t}=i,x_{t+1}=j|y,v,w;\theta)= {\frac {\alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}{\sum _{i=1}^{N} \sum _{j=1}^{N} \alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}}
-% \end{equation}
 
 \section{Credential}
 \label{sec:credential}
@@ -293,7 +289,8 @@ Actually the predicate $\phi$ in the definition of $pi_v$ can be thought as perf
                     &= (c_m k + r_k) \cdot\gamma + (c_m m + r_m\cdot c) \\
                     &= (c_m k + w_k - c_m k ) \cdot\gamma + (c_m m + w_m - c_m m)\cdot c) \\
                     &= w_k\cdot\gamma + w_m\cdot c = B_w \\
-    \widehat{C}_w   &= c_m\cdot c + r_r\cdot G_1 + r_m\cdot HS = c_m\cdot (r\cdot G_1 +                     m\cdot HS) + r_r\cdot G_1 + r_m\cdot HS \\
+    \widehat{C}_w   &= c_m\cdot c + r_r\cdot G_1 + r_m\cdot HS \\
+                    &= c_m\cdot (r\cdot G_1 + m \cdot HS) + r_r\cdot G_1 + r_m\cdot HS \\
                     &= (c_m r + r_r) G_1 + (c_m m + r_m) HS \\
                     &= (c_m r + w_r - c_m r)\cdot G_1 + (c_m m + w_m - c_m m)\cdot HS \\
                     &= w_r \cdot G_1 + w_m\cdot HS = C_w
@@ -348,11 +345,11 @@ as well public BLS keys that can be aggregated for signature
 verification.
 
 Figure~\ref{fig:keygen} illustrates how this process consists of two
-different function calls: $keygen$ to create an ElGamal keypair and
-$prepareBlindSign$ to generate a Coconut credential request. An
-interactive exchange takes place between the Signer and the Issuer
-that verifies the possession of the secret ElGamal key and signs a
-credential to witness this condition.
+different function calls: \verb!keygen! to create an ElGamal keypair
+and \verb!prepare_blind_sign! to generate a Coconut credential
+request. An interactive exchange takes place between the Signer and
+the Issuer that verifies the possession of the secret ElGamal key and
+signs a credential to witness this condition.
 
 \begin{figure}
   \caption{Keygen process sequence diagram}
