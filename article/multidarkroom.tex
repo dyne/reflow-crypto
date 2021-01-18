@@ -166,8 +166,47 @@ about 3 times faster.
 \section{Signature}
 \label{sec:signature}
 
-\lipsum[1]
-
+Throughout this and the next section we will adopt the following notations: 
+\begin{itemize}
+    \item $\mathbb{F}_p$ is the prime finite field with $p$ elements (i.e. of prime order $p$). In our case the prime is long 383 bits;
+    \item $E$ denotes the (additive) group of points of the curve BLS-383 of order $n$ which can be described with the Weierstrass form  $y^2=x^3 + 16$; 
+    \item $E_T$ represents instead the group of points of the twisted curve of BLS-383, with embedding degree $k=12$. The order of this group is also $n$;
+\end{itemize}
+We also require defining the notion of a cryptographic pairing. Basically it is a function $e: \mathbb{G}_1\times\mathbb{G}_2\to \mathbb{G}_T$, where $\mathbb{G}_1,\mathbb{G}_2$ and $\mathbb{G}_T$ are all groups of same order $n$, such that satisfies the following properties:
+\begin{itemize}
+    \item [i.] \emph{Bilinearity}, i.e. given $P,Q\in\mathbb{G}_1$ and $R,S\in\mathbb{G}_2$, we have 
+    \begin{align*}
+        e(P+Q,R) = e(P,R)\cdot e(Q,R) \\
+        e(P,R+S) = e(P,R)\cdot e(P,S)
+    \end{align*}
+    \item[ii.] \emph{Non-degeneracy}, meaning that for all $g_1\in\mathbb{G}_1, g_2\in\mathbb{G}_2$, $e(g_1,g_2)\ne 1_{\mathbb{G}_T}$, the identity element of the group $\mathbb{G}_T$;
+    \item[iii.] \emph{ Efficiency}, so that the map $e$ is easy to compute;
+    \item[iv. ] $\mathbb{G}_1\ne \mathbb{G}_2$, and moreover, that there exist no efficient homomorphism between $\mathbb{G}_1$ and $\mathbb{G}_2$.
+\end{itemize}
+For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G}_1 = E$, and $\mathbb{G}_T\subset \mathbb{F}_{p^{12}}$ is the subgroup containing the $n$-th roots of unity. Instead $e: E_T  \times E\to \mathbb{G}_T$ is the \emph{Miller pairing}. \\
+A \emph{BLS signature} is a signature scheme whose design exploits a cryptographic pairing. As for other well known algorithm such as ECDSA, it will work following these three main steps:
+\begin{itemize}
+    \item  \textbf{Key Generation phase.} For a user who wants to sign a message $m$, a secret key $sk$ is randomically chosen uniformly in $\mathbb{F}_n$, where $n$ is the order of the groups $\mathbb{G}_1, \mathbb{G}_2, \mathbb{G}_T$. The corresponding public key $pk$ is the element $sk\cdot G_2\in E_T$;
+    \item   \textbf{Signing phase.} The message $m$ is first hashed into a point $H\in E$ using a cryptographic hash function (treated as a random oracle), the related signature is then given by $\sigma = sk\cdot P$;
+    \item   \textbf{Verification phase.} For an other user that wants to verify the authenticity and the integrity of the message $m$, it needs to
+    \begin{itemize}
+        \item [1.] parse $m, pk$ and $\sigma$
+        \item [2.] hash the message $m$ into the point $H$ and then check if the following identity holds,
+        \[
+        e(pk,H) = e(G_2,\sigma)
+        \]
+    \end{itemize}
+\end{itemize}
+If verification passes it means that $\sigma$ is a valid signature for $m$ and the protocol ends without errors.
+\emph{Proof of the verification algorithm.} By using the definitions of the elements involved and exploiting the property of the pairing $e$ we have
+\[
+\begin{split}
+    e(pk,H) &= e(sk\cdot G_2, H) \\
+            &= e(G_2,H)^{sk}\\
+            &= e(G_2,sk\cdot H)\\
+            &= e(G_2,\sigma)
+\end{split}
+\]
 \section{Credential}
 \label{sec:credential}
 
@@ -299,7 +338,7 @@ Regarding the second proof $\pi_v$, we have to prove both the identities (\ref{c
     e(\kappa, c') &= e(\alpha + m\cdot\beta + r\cdot G_2, c') \\
     &= e(x\cdot G_2 + my\cdot G_2  + r\cdot G_2,\tilde{r}\cdot G_1) \\
     &= e((x+my+r)\cdot G_2, \tilde{r}\cdot G_1) \\
-    &= e(G_2,G_1)(x+my+r)\tilde{r}
+    &= e(G_2,G_1)^{(x+my+r)\tilde{r}}
 \end{align*}
 using the substitution $c'=\tilde{r}\cdot G_1$, with $\tilde{r}\in\mathbb{F}_p$ since we know that $c'\in E$. For the RHS we have instead
 \begin{align*}
@@ -323,7 +362,7 @@ So, at the end
     e(G_2, s' + \nu) &= e(G_2, r'(x\cdot c + y\cdot b - dy\cdot a + r \cdot c)) \\
     &= e(G_2, r'(x + ym + r) \cdot c) \\
     &= e(G_2,(x+my+r)\tilde{r}\cdot G_1) \\
-    &= e(G_2,G_1)(x+my+r)\tilde{r}
+    &= e(G_2,G_1)^{(x+my+r)\tilde{r}}
 \end{split}
 \]
 and (\ref{miller}) is finally proved.
