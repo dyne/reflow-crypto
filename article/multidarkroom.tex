@@ -13,6 +13,7 @@
 \usepackage{url}            % simple URL typesetting
 \usepackage{booktabs}       % professional-quality tables
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{enumitem}
 \setlist[itemize]{align=parleft,left=0pt..1em}
 \setlist[enumerate]{align=parleft,left=0pt..1em}
@@ -183,11 +184,11 @@ We also require defining the notion of a cryptographic pairing. Basically it is 
     \item[iii.] \emph{ Efficiency}, so that the map $e$ is easy to compute;
     \item[iv. ] $\mathbb{G}_1\ne \mathbb{G}_2$, and moreover, that there exist no efficient homomorphism between $\mathbb{G}_1$ and $\mathbb{G}_2$.
 \end{itemize}
-For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G}_1 = E$, and $\mathbb{G}_T\subset \mathbb{F}_{p^{12}}$ is the subgroup containing the $n$-th roots of unity. Instead $e: E_T  \times E\to \mathbb{G}_T$ is the \emph{Miller pairing}. \\
+For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G}_1 = E$, and $\mathbb{G}_T\subset \mathbb{F}_{p^{12}}$ is the subgroup containing the $n$-th roots of unity. Instead $e: E_T  \times E\to \mathbb{G}_T$ is the \emph{Miller pairing}, which in our code is referred as the method \verb!miller(ECP2 P, ECP Q)!. \\
 A \emph{BLS signature} is a signature scheme whose design exploits a cryptographic pairing. As for other well known algorithm such as ECDSA, it will work following these three main steps:
 \begin{itemize}
     \item  \textbf{Key Generation phase.} For a user who wants to sign a message $m$, a secret key $sk$ is randomically chosen uniformly in $\mathbb{F}_n$, where $n$ is the order of the groups $\mathbb{G}_1, \mathbb{G}_2, \mathbb{G}_T$. The corresponding public key $pk$ is the element $sk\cdot G_2\in E_T$;
-    \item   \textbf{Signing phase.} The message $m$ is first hashed into a point $H\in E$ using a cryptographic hash function (treated as a random oracle), the related signature is then given by $\sigma = sk\cdot P$;
+    \item   \textbf{Signing phase.} The message $m$ is first hashed into a point $H\in E$ using a cryptographic hash function (treated as a random oracle), which in our scheme is done by the method \verb!hashtopoint!; the related signature is then given by $\sigma = sk\cdot P$;
     \item   \textbf{Verification phase.} For an other user that wants to verify the authenticity and the integrity of the message $m$, it needs to
     \begin{itemize}
         \item [1.] parse $m, pk$ and $\sigma$
@@ -198,7 +199,8 @@ A \emph{BLS signature} is a signature scheme whose design exploits a cryptograph
     \end{itemize}
 \end{itemize}
 If verification passes it means that $\sigma$ is a valid signature for $m$ and the protocol ends without errors.
-\emph{Proof of the verification algorithm.} By using the definitions of the elements involved and exploiting the property of the pairing $e$ we have
+\begin{proof}
+ [Proof of the verification algorithm:] By using the definitions of the elements involved and exploiting the property of the pairing $e$ we have
 \[
 \begin{split}
     e(pk,H) &= e(sk\cdot G_2, H) \\
@@ -207,6 +209,30 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
             &= e(G_2,\sigma)
 \end{split}
 \]
+\end{proof}
+BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, with the assumption made on $e$, the signature is produced in a very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained specifically for two signatures using the same message $m$ but different partecipants:
+\begin{itemize}
+    \item after collecting the signatures $\sigma_1$ and $\sigma_2$, to compute the new cryptographical object first of all we generate a base point $R= r\cdot H$, where $r\in\mathbb{F}_n$ is randomly generated and $H$ is again the hashed point derived from $m$;\\
+    \item the aggrageted $\sigma$ is then obtained by simply summing $R+\sigma_1+\sigma_2$;
+    \item in order to verify that $\sigma$ is valid we compute $P = pk_R + pk_1 + pk_2$, where $pk_R = r\cdot G_2$, that works as a public key with respect to the nonce $r$, which instead is kept secret. Verification is then performed by checking if the following identity holds
+    \[ 
+    e(P,H) = e(G_2,\sigma)
+    \]
+\end{itemize}
+If verification passes without errors it means that $\sigma$ is a valid aggregated signature of $m$.
+\begin{proof}
+By recalling that $\sigma = R + \sigma_1 + \sigma_2$, $P = pk_R + pk_1 + pk_2$, by using the property of the pairing $e$ we have
+\[
+\begin{split}
+    e(P,H)  &= e(pk_R + pk_1 + pk_2, H) \\
+            &= e((r + sk_1 + sk_2)\cdot G_2,H)\\
+            &= e(G_2,H)^{r + sk_1 + sk_2}\\
+            &= e(G_2,(r + sk_1 + sk_2)\cdot H) \\
+            &= e(G_2,R + \sigma_1 + \sigma_2) \\
+            &= e(G_2,\sigma)
+\end{split}
+\]
+\end{proof} 
 \section{Credential}
 \label{sec:credential}
 
@@ -332,7 +358,7 @@ Actually the predicate $\phi$ in the definition of $pi_v$ can be thought as perf
                     &= (c_m r + r_r) G_1 + (c_m m + r_m) HS \\
                     &= (c_m r + w_r - c_m r)\cdot G_1 + (c_m m + w_m - c_m m)\cdot HS \\
                     &= w_r \cdot G_1 + w_m\cdot HS = C_w
-\end{align*}
+\end{align*} 
 Regarding the second proof $\pi_v$, we have to prove both the identities (\ref{challenge pi_v}) and (\ref{miller}) hold. We will focus only on the latter since the former requires a similar approach on what we have have done for $\pi_s$, but with different parameters involved ($\kappa, \nu$, etc.). The LHS of the relation can be expressed as
 \begin{align*}
     e(\kappa, c') &= e(\alpha + m\cdot\beta + r\cdot G_2, c') \\
@@ -365,7 +391,8 @@ So, at the end
     &= e(G_2,G_1)^{(x+my+r)\tilde{r}}
 \end{split}
 \]
-and (\ref{miller}) is finally proved.
+and (\ref{miller}) is finally proved. 
+\qed
 
 \section{Implementation}
 \label{sec:implementation}
