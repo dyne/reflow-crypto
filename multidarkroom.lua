@@ -1,6 +1,6 @@
 -- This file is part of Zenroom (https://zenroom.dyne.org)
 --
--- Copyright (C) 2020 Dyne.org foundation
+-- Copyright (C) 2020-2021 Dyne.org foundation
 -- Written by Denis Roio
 --
 -- This program is free software: you can redistribute it and/or modify
@@ -50,11 +50,11 @@ ck2 = INT.random()
 PK2 = G2 * sk2
 
 -- issuer sign ZK credentials
-Lambda1 = ZK.prepare_blind_sign(ck1*G1, ck1) -- credential request:       p -> i
+Lambda1 = ZK.prepare_blind_sign(ck1) -- credential request:       p -> i
 SigmaTilde1 = ZK.blind_sign(issuer.sign, Lambda1)    -- issuer signs credential:  i -> p
 Sigma1 = ZK.aggregate_creds(ck1, {SigmaTilde1})  -- credential sigma          p -> store
 
-Lambda2 = ZK.prepare_blind_sign(ck2*G1, ck2)
+Lambda2 = ZK.prepare_blind_sign(ck2)
 SigmaTilde2 = ZK.blind_sign(issuer.sign, Lambda2)
 Sigma2 = ZK.aggregate_creds(ck2, {SigmaTilde2})
 
