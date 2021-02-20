@@ -12,6 +12,15 @@ References:
 - BLS https://tools.ietf.org/html/draft-irtf-cfrg-bls-signature-02
 - BLS https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html
 
+## Quick start
+
+1. Clone this repository
+
+2. Run `sudo make install` to download latest zenroom and install dependencies
+
+3. Run `make check` to run multidarkroom tests
+
+
 ## Keygen and credential signature
 
 Alice as a participant contacts the Issuer to verify its possession of a secret key.
