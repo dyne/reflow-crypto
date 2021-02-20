@@ -3,21 +3,19 @@
 
 ####################
 # common script init
-if ! test -r ../utils.sh; then
-	echo "run executable from its own directory: $0"; exit 1; fi
-. ../utils.sh
+. ./utils.sh
 Z="`detect_zenroom_path` `detect_zenroom_conf`"
 ####################
 
 ## ISSUER
-cat <<EOF | zexe issuer_keygen.zen | tee issuer_key.json
+cat <<EOF | zexe issuer_keygen.zen -l zencode_multidarkroom.lua | tee issuer_key.json
 Scenario multidarkroom
 Given I am 'The Authority'
 when I create the issuer key
 Then print my 'issuer key'
 EOF
 
-cat <<EOF | zexe issuer_credential.zen -k issuer_key.json | tee credential.json
+cat <<EOF | zexe issuer_credential.zen -l zencode_multidarkroom.lua -k issuer_key.json | tee credential.json
 Scenario multidarkroom
 Given I am 'The Authority'
 and I have my 'issuer key'
@@ -29,14 +27,14 @@ EOF
 generate_participant() {
     local name=$1
     ## PARTICIPANT
-	cat <<EOF | zexe keygen_${1}.zen | tee keypair_${1}.json
+	cat <<EOF | zexe keygen_${1}.zen -l zencode_multidarkroom.lua | tee keypair_${1}.json
 Scenario multidarkroom
 Given I am '${1}'
 When I create the keypair
 Then print my 'keypair'
 EOF
 
-	cat <<EOF | zexe pubkey_${1}.zen -k keypair_${1}.json | tee verifier_${1}.json
+	cat <<EOF | zexe pubkey_${1}.zen -l zencode_multidarkroom.lua -k keypair_${1}.json | tee verifier_${1}.json
 Scenario multidarkroom
 Given I am '${1}'
 and I have my 'keypair'
@@ -44,7 +42,7 @@ When I create the verifier
 Then print my 'verifier'
 EOF
 
-	cat <<EOF | zexe request_${1}.zen -k keypair_${1}.json | tee request_${1}.json
+	cat <<EOF | zexe request_${1}.zen -l zencode_multidarkroom.lua -k keypair_${1}.json | tee request_${1}.json
 Scenario multidarkroom
 Given I am '${1}'
 and I have my 'keypair'
@@ -54,7 +52,7 @@ EOF
 	##
 
 	## ISSUER SIGNS
-	cat <<EOF | zexe issuer_sign_${1}.zen -k issuer_key.json -a request_${1}.json | tee issuer_signature_${1}.json
+	cat <<EOF | zexe issuer_sign_${1}.zen -l zencode_multidarkroom.lua -k issuer_key.json -a request_${1}.json | tee issuer_signature_${1}.json
 Scenario multidarkroom
 Given I am 'The Authority'
 and I have my 'issuer key'
@@ -65,7 +63,7 @@ EOF
 	##
 
 	## PARTICIPANT AGGREGATES SIGNED CREDENTIAL
-	cat <<EOF | zexe aggr_cred_${1}.zen -k keypair_${1}.json -a issuer_signature_${1}.json | tee verified_credential_${1}.json
+	cat <<EOF | zexe aggr_cred_${1}.zen -l zencode_multidarkroom.lua -k keypair_${1}.json -a issuer_signature_${1}.json | tee verified_credential_${1}.json
 Scenario multidarkroom
 Given I am '${1}'
 and I have my 'keypair'
@@ -90,7 +88,7 @@ echo "{\"today\": \"`date +'%s'`\"}" > uid.json
 # anyone can start a session
 
 # SIGNING SESSION
-cat <<EOF | zexe session_start.zen -k uid.json -a verifiers.json > multisignature.json
+cat <<EOF | zexe session_start.zen -l zencode_multidarkroom.lua -k uid.json -a verifiers.json > multisignature.json
 Scenario multidarkroom
 Given I have a 'verifier' from 'Alice'
 and I have a 'verifier' from 'Bob'
@@ -108,7 +106,7 @@ json_join credential.json multisignature.json > credential_to_sign.json
 # PARTICIPANT SIGNS (function)
 function participant_sign() {
 	local name=$1
-	cat <<EOF | zexe sign_session.zen -a credential_to_sign.json -k verified_credential_$name.json | tee signature_$name.json
+	cat <<EOF | zexe sign_session.zen -l zencode_multidarkroom.lua -a credential_to_sign.json -k verified_credential_$name.json | tee signature_$name.json
 Scenario multidarkroom
 Given I am '$name'
 and I have my 'verified credential'
@@ -129,7 +127,7 @@ function collect_sign() {
 	local tmp_sig=`mktemp`
 	cp -v multisignature.json $tmp_msig
 	json_join credential.json signature_$name.json > $tmp_sig
-	cat << EOF | zexe collect_sign.zen -a $tmp_msig -k $tmp_sig | tee multisignature.json
+	cat << EOF | zexe collect_sign.zen -l zencode_multidarkroom.lua -a $tmp_msig -k $tmp_sig | tee multisignature.json
 Scenario multidarkroom
 Given I have a 'multisignature'
 and I have a 'credential' from 'The Authority'
@@ -149,7 +147,7 @@ collect_sign 'Alice'
 collect_sign 'Bob'
 
 # VERIFY SIGNATURE
-cat << EOF | zexe verify_sign.zen -a multisignature.json | jq .
+cat << EOF | zexe verify_sign.zen -l zencode_multidarkroom.lua -a multisignature.json | jq .
 Scenario multidarkroom
 Given I have a 'multisignature'
 When I verify the multisignature is valid
