@@ -3,7 +3,7 @@
 
 ####################
 # common script init
-. ./utils.sh
+. ./aux/utils.sh
 Z="`detect_zenroom_path` `detect_zenroom_conf`"
 ####################
 
