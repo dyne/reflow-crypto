@@ -170,7 +170,7 @@ about 3 times faster.
 Throughout this and the next section we will adopt the following notations: 
 \begin{itemize}
     \item $\mathbb{F}_p$ is the prime finite field with $p$ elements (i.e. of prime order $p$). In our case the prime is long 383 bits;
-    \item $E$ denotes the (additive) group of points of the curve BLS-383 of order $n$ which can be described with the Weierstrass form  $y^2=x^3 + 16$; 
+    \item $E$ denotes the (additive) group of points of the curve BLS-383 \citep{bls383} of order $n$ which can be described with the Weierstrass form  $y^2=x^3 + 16$; 
     \item $E_T$ represents instead the group of points of the twisted curve of BLS-383, with embedding degree $k=12$. The order of this group is also $n$;
 \end{itemize}
 We also require defining the notion of a cryptographic pairing. Basically it is a function $e: \mathbb{G}_1\times\mathbb{G}_2\to \mathbb{G}_T$, where $\mathbb{G}_1,\mathbb{G}_2$ and $\mathbb{G}_T$ are all groups of same order $n$, such that satisfies the following properties:
@@ -218,7 +218,7 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
 \end{split}
 \]
 \end{proof}
-BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, with the assumption made on $e$, the signature is produced in a very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained specifically for two signatures using the same message $m$ but different partecipants:
+BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, with the assumption made on $e$, the signature is produced in a very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained specifically for two signatures using the same message $m$ but different partecipants:
 \begin{itemize}
     \item after collecting the signatures $\sigma_1$ and $\sigma_2$, to compute the new cryptographical object first of all we generate a base point $R= r\cdot H$, where $r\in\mathbb{F}_n$ is randomly generated and $H$ is again the hashed point derived from $m$;\\
     \item the aggrageted $\sigma$ is then obtained by simply summing $R+\sigma_1+\sigma_2$;
@@ -404,7 +404,8 @@ and (\ref{miller}) is finally proved.
 \qed
 
 \paragraph{Security considerations.} 
-As mentioned in \citep{coconut-2018}, BLS signature and the proof system obtained with Coconut are considered secure by assuming the the existence of random oracles, together with the decisional Diffie-Hellman Problem (DDH), the external Diffie-Hellman Problem (XDH), and with the Lysyanskaya-Rivest-Sahai-Wol Problem (LRSW), which are connected to the Discrete Logarithm. In fact, under these assumptions, we have that our protocol satisfies uforgeability, blindness, and unlinkability.
+
+As mentioned in Coconut \citep{coconut-2018}, BLS signatures and the proof system obtained with credentials are considered secure by assuming the existence of random oracles \citep{random-oracle}, together with the decisional Diffie-Hellman Problem (DDH) \citep{DDH-problem}, the external Diffie-Hellman Problem (XDH), and with the Lysyanskaya-Rivest-Sahai-Wol Problem (LRSW) \citep{lrsw-assumption}, which are connected to the Discrete Logarithm. In fact, under these assumptions, we have that our protocol satisfies uforgeability, blindness, and unlinkability.
 
 \section{Implementation}
 \label{sec:implementation}
