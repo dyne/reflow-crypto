@@ -185,9 +185,17 @@ We also require defining the notion of a cryptographic pairing. Basically it is 
     \item[iv. ] $\mathbb{G}_1\ne \mathbb{G}_2$, and moreover, that there exist no efficient homomorphism between $\mathbb{G}_1$ and $\mathbb{G}_2$.
 \end{itemize}
 For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G}_1 = E$, and $\mathbb{G}_T\subset \mathbb{F}_{p^{12}}$ is the subgroup containing the $n$-th roots of unity. Instead $e: E_T  \times E\to \mathbb{G}_T$ is the \emph{Miller pairing}, which in our code is referred as the method \verb!miller(ECP2 P, ECP Q)!. \\
-A \emph{BLS signature} is a signature scheme whose design exploits a cryptographic pairing. As for other well known algorithm such as ECDSA, it will work following these three main steps:
+A \emph{BLS signature} is a signature scheme whose design exploits a cryptographic pairing. As for other well known algorithm such as ECDSA, it will work following these four main steps:
 \begin{itemize}
     \item  \textbf{Key Generation phase.} For a user who wants to sign a message $m$, a secret key $sk$ is randomically chosen uniformly in $\mathbb{F}_n$, where $n$ is the order of the groups $\mathbb{G}_1, \mathbb{G}_2, \mathbb{G}_T$. The corresponding public key $pk$ is the element $sk\cdot G_2\in E_T$;
+    \item \textbf{Session Generation.} Anyone willing to start a signing session on a message $m$ will create:
+    \begin{itemize}
+       \item[1.] a random $r$ and its corresponding point $R = r\cdot G_2$
+       \item[2.] the sum of $R$ and all $pk$ supposed to participate to the signature such as $P = R + \sum_i pk_i$
+       \item[3.] the unique identifier of the session calculated as hash to point of the message $m$, such as $UID = H(m)\in E$
+       \item[4.] the first layer of the signature $S \leftarrow r\cdot UID$, later to be summed with all other signatures in a multi-party computation setup resulting in the final signature as $S \leftarrow r\cdot UID + \sum_i sk_i\cdot UID$
+       \item[5.] the array of unique fingerprints of each signature resulting from the credential authentication (see section \ref{credential}) such as $\{\zeta_{i_1},\dots,\zeta_{i_n}\}$
+    \end{itemize}
     \item   \textbf{Signing phase.} The message $m$ is first hashed into a point $H\in E$ using a cryptographic hash function (treated as a random oracle), which in our scheme is done by the method \verb!hashtopoint!; the related signature is then given by $\sigma = sk\cdot P$;
     \item   \textbf{Verification phase.} For an other user that wants to verify the authenticity and the integrity of the message $m$, it needs to
     \begin{itemize}
