@@ -212,6 +212,8 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
 \end{proof}
 
 BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, with the assumption made on $e$, the signature is produced in a very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained in the context of a multi-party computation using the same message $m$ but different partecipants.
+
+\paragraph{Session Generation}
 After the key generation step we introduce a new phase called \textbf{session generation}, where the signature is initialized; anyone willing to start a signing session on a message $m$ will create:
 \begin{itemize}
     \item[1.] a random $r$ and its corresponding point $R = r\cdot G_2$
@@ -228,7 +230,6 @@ Finally, the resulting output will be $\sigma = S_N$, where $N$ is the total num
     \[ 
     e(P,H) = e(G_2,\sigma)
     \]
-\end{itemize}
 If verification passes without errors it means that $\sigma$ is a valid aggregated signature of $m$.
 \begin{proof}
 For simplicity we will prove the above statement for $N=2$, since the general case can be obtained by an inductive argument. By recalling that $\sigma = R + \sigma_1 + \sigma_2$, $P = pk_R + pk_1 + pk_2$, by using the property of the pairing $e$ we have
