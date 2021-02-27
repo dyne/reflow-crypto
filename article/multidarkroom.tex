@@ -188,14 +188,6 @@ For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G
 A \emph{BLS signature} is a signature scheme whose design exploits a cryptographic pairing. As for other well known algorithm such as ECDSA, it will work following these four main steps:
 \begin{itemize}
     \item  \textbf{Key Generation phase.} For a user who wants to sign a message $m$, a secret key $sk$ is randomically chosen uniformly in $\mathbb{F}_n$, where $n$ is the order of the groups $\mathbb{G}_1, \mathbb{G}_2, \mathbb{G}_T$. The corresponding public key $pk$ is the element $sk\cdot G_2\in E_T$;
-    \item \textbf{Session Generation.} Anyone willing to start a signing session on a message $m$ will create:
-    \begin{itemize}
-       \item[1.] a random $r$ and its corresponding point $R = r\cdot G_2$
-       \item[2.] the sum of $R$ and all $pk$ supposed to participate to the signature such as $P = R + \sum_i pk_i$
-       \item[3.] the unique identifier \verb!UID! of the session calculated as hash to point of the message $m$, such as $U = H(m)\in E$, where $H$ is a combination of a cryptographic hash function (treated as a random oracle) together with an encoding into elliptic curve points procedure
-       \item[4.] the first layer of the signature $S \leftarrow r\cdot U$, later to be summed with all other signatures in a multi-party computation setup resulting in the final signature as $S \leftarrow r\cdot U + \sum_i sk_i\cdot U$
-       \item[5.] the array of unique fingerprints $\zeta_i$ of each signature resulting from the credential authentication (see section \ref{sec:credential}) 
-    \end{itemize}
     \item   \textbf{Signing phase.} The message $m$ is first hashed into the $U\in E$, which in our scheme is done by the method \verb!hashtopoint!; the related signature is then given by $\sigma = sk\cdot P$;
     \item   \textbf{Verification phase.} For an other user that wants to verify the authenticity and the integrity of the message $m$, it needs to
     \begin{itemize}
@@ -218,18 +210,28 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
 \end{split}
 \]
 \end{proof}
-BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, with the assumption made on $e$, the signature is produced in a very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained specifically for two signatures using the same message $m$ but different partecipants:
+
+BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, with the assumption made on $e$, the signature is produced in a very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained in the context of a multi-party computation using the same message $m$ but different partecipants.
+After the key generation step we introduce a new phase called \textbf{session generation}, where the signature is initialized; anyone willing to start a signing session on a message $m$ will create:
 \begin{itemize}
-    \item after collecting the signatures $\sigma_1$ and $\sigma_2$, to compute the new cryptographical object first of all we generate a base point $R= r\cdot H$, where $r\in\mathbb{F}_n$ is randomly generated and $H$ is again the hashed point derived from $m$;\\
-    \item the aggrageted $\sigma$ is then obtained by simply summing $R+\sigma_1+\sigma_2$;
-    \item in order to verify that $\sigma$ is valid we compute $P = pk_R + pk_1 + pk_2$, where $pk_R = r\cdot G_2$, that works as a public key with respect to the nonce $r$, which instead is kept secret. Verification is then performed by checking if the following identity holds
+    \item[1.] a random $r$ and its corresponding point $R = r\cdot G_2$
+    \item[2.] the sum of $R$ and all $pk$ supposed to participate to the signature such as $P = R + \sum_i pk_i$
+    \item[3.] the unique identifier \verb!UID! of the session calculated as hash to point of the message $m$, such as $U = H(m)\in E$, where $H$ is a combination of a cryptographic hash function (treated as a random oracle) together with an encoding into elliptic curve points procedure
+    \item[4.] the first layer of the signature $\sigma \leftarrow r\cdot U$, later to be summed with all other signatures in a multi-party computation setup resulting in the final signature as $\sigma \leftarrow r\cdot U + \sum_i sk_i\cdot U$
+    \item[5.] the array of unique fingerprints $\zeta_i$ of each signature resulting from the credential authentication (see section \ref{sec:credential}) 
+\end{itemize}
+After this phase is terminated, every partecipants involved in the session start their own signing phase, producing (from the same message $m$) their respective $\sigma_i$'s. The final signature $\sigma$ is then computed in this way: first of all let us call $\sigma_0 = R$, then supposing $k$ partecipants have already aggrgated their $\sigma_i$, obtaing a partial signature $S_k$, the $(k+1)$-th one will compute
+\[
+  S_{k+1}=S_k+\sigma_k = \sum_{i=0}^{k+1} \sigma_i
+\]
+Finally, the resulting output will be $\sigma = S_N$, where $N$ is the total number of the signers of the session. In order to verify that $\sigma$ is valid we compute $P = pk_R + \sum_{i=0} ^N pk_i$, where $pk_R = r\cdot G_2$, that works as a public key with respect to the nonce $r$, which instead is kept secret. Verification is then performed by checking if the following identity holds
     \[ 
     e(P,H) = e(G_2,\sigma)
     \]
 \end{itemize}
 If verification passes without errors it means that $\sigma$ is a valid aggregated signature of $m$.
 \begin{proof}
-By recalling that $\sigma = R + \sigma_1 + \sigma_2$, $P = pk_R + pk_1 + pk_2$, by using the property of the pairing $e$ we have
+For simplicity we will prove the above statement for $N=2$, since the general case can be obtained by an inductive argument. By recalling that $\sigma = R + \sigma_1 + \sigma_2$, $P = pk_R + pk_1 + pk_2$, by using the property of the pairing $e$ we have
 \[
 \begin{split}
     e(P,H)  &= e(pk_R + pk_1 + pk_2, H) \\
@@ -296,7 +298,7 @@ At this point the user will now have a blind credential $\tilde{\sigma} = (c, \t
 \tilde{a} &= y \cdot a \\
 \tilde{b} &= x\cdot c + y\cdot b
 \end{align*}
- The user then will have to unblind it using its secret credential key, obtaining $\sigma = (c, s) = (c, \tilde{b} - ck_i (\tilde{a}))$, which will use to prove its identity when signing a message. The procedure is similar to the one seen before with some extra details:
+The user then will have to unblind it using its secret credential key, obtaining $\sigma = (c, s) = (c, \tilde{b} - ck_i (\tilde{a}))$, which will use to prove its identity when signing a message. The procedure is similar to the one seen before with some extra details:
 \begin{itemize}
     \item \textbf{Setup.} As for the the BLS signature, an elliptic point $H$, associated to the hash of the message to sign, is required as an Unique Identifier (\verb!UID!) for the signing session;
     \item \textbf{Credential proving.} The user produces two cryptographical objects $\theta$ (containing a new proof $\pi_v$) and $\zeta$ (which is unequivocally associated to $H$) through \verb!prove_cred_uid!, taking as input its own credential $\sigma$, the related secret attribute $c_k$, the authority public key $v_k = (\alpha, \beta)$ and the session point $H$.
