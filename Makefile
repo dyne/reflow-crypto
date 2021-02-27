@@ -5,3 +5,6 @@ install:
 
 check:
 	./zencode_test.sh
+
+clean:
+	rm -f *.zen *.json
