@@ -192,17 +192,17 @@ A \emph{BLS signature} is a signature scheme whose design exploits a cryptograph
     \begin{itemize}
        \item[1.] a random $r$ and its corresponding point $R = r\cdot G_2$
        \item[2.] the sum of $R$ and all $pk$ supposed to participate to the signature such as $P = R + \sum_i pk_i$
-       \item[3.] the unique identifier of the session calculated as hash to point of the message $m$, such as $UID = H(m)\in E$
-       \item[4.] the first layer of the signature $S \leftarrow r\cdot UID$, later to be summed with all other signatures in a multi-party computation setup resulting in the final signature as $S \leftarrow r\cdot UID + \sum_i sk_i\cdot UID$
-       \item[5.] the array of unique fingerprints of each signature resulting from the credential authentication (see section \ref{credential}) such as $\{\zeta_{i_1},\dots,\zeta_{i_n}\}$
+       \item[3.] the unique identifier \verb!UID! of the session calculated as hash to point of the message $m$, such as $U = H(m)\in E$, where $H$ is a combination of a cryptographic hash function (treated as a random oracle) together with an encoding into elliptic curve points procedure
+       \item[4.] the first layer of the signature $S \leftarrow r\cdot U$, later to be summed with all other signatures in a multi-party computation setup resulting in the final signature as $S \leftarrow r\cdot U + \sum_i sk_i\cdot U$
+       \item[5.] the array of unique fingerprints $\zeta_i$ of each signature resulting from the credential authentication (see section \ref{sec:credential}) 
     \end{itemize}
-    \item   \textbf{Signing phase.} The message $m$ is first hashed into a point $H\in E$ using a cryptographic hash function (treated as a random oracle), which in our scheme is done by the method \verb!hashtopoint!; the related signature is then given by $\sigma = sk\cdot P$;
+    \item   \textbf{Signing phase.} The message $m$ is first hashed into the $U\in E$, which in our scheme is done by the method \verb!hashtopoint!; the related signature is then given by $\sigma = sk\cdot P$;
     \item   \textbf{Verification phase.} For an other user that wants to verify the authenticity and the integrity of the message $m$, it needs to
     \begin{itemize}
         \item [1.] parse $m, pk$ and $\sigma$
-        \item [2.] hash the message $m$ into the point $H$ and then check if the following identity holds,
+        \item [2.] hash the message $m$ into the point $U$ and then check if the following identity holds,
         \[
-        e(pk,H) = e(G_2,\sigma)
+        e(pk,U) = e(G_2,\sigma)
         \]
     \end{itemize}
 \end{itemize}
@@ -211,9 +211,9 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
  [Proof of the verification algorithm:] By using the definitions of the elements involved and exploiting the property of the pairing $e$ we have
 \[
 \begin{split}
-    e(pk,H) &= e(sk\cdot G_2, H) \\
+    e(pk,H) &= e(sk\cdot G_2, U) \\
             &= e(G_2,H)^{sk}\\
-            &= e(G_2,sk\cdot H)\\
+            &= e(G_2,sk\cdot U)\\
             &= e(G_2,\sigma)
 \end{split}
 \]
