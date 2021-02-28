@@ -156,10 +156,10 @@ Following this setup any participant will be able to produce a zero-knowledge pr
 The base application of Multidarkdroom is obviously the collective signature of digital documents, following such a flow:
 
 \begin{itemize}
-  \item[1.] One may choose a document and decide to indict its signature
-  \item[2.] One selects the participants to the signature and publishes it
-  \item[3.] Participants may chose to add their signature to the document
-  \item[4.] Anyone may verify the document is signed by all and only all participants
+  \item[1.] One may choose a document and decide to indict a signature session linked to it
+  \item[2.] One selects the participants and opens the public signature session
+  \item[3.] Participants may chose to add their anonymous signature to the session 
+  \item[4.] Anyone may verify if the document is signed by all and only all participants
 \end{itemize}
 
 Going beyond a single document signing scenario, Multidarkroom can be
@@ -198,10 +198,12 @@ product, providing authenticated information about  the whole set of actors, too
 \end{itemize}
 We also require defining the notion of a cryptographic pairing. Basically it is a function $e: \mathbb{G}_1\times\mathbb{G}_2\to \mathbb{G}_T$, where $\mathbb{G}_1,\mathbb{G}_2$ and $\mathbb{G}_T$ are all groups of same order $n$, such that satisfies the following properties:
 \begin{itemize}
-    \item [i.] \emph{Bilinearity}, i.e. given $P,Q\in\mathbb{G}_1$ and $R,S\in\mathbb{G}_2$, we have 
+    \item [i.] \emph{Bilinearity}, i.e. given $P_1,Q_1\in\mathbb{G}_1$ and $P_2,Q_2\in\mathbb{G}_2$, we have 
+%    \item [i.] \emph{Bilinearity}, i.e. given $P,Q\in\mathbb{G}_1$ and $R,S\in\mathbb{G}_2$, we have 
+
     \begin{align*}
-        e(P+Q,R) = e(P,R)\cdot e(Q,R) \\
-        e(P,R+S) = e(P,R)\cdot e(P,S)
+        e(P_1+Q_1,P_2) = e(P_1,P_2)\cdot e(Q_1,P_2) \\
+        e(P_1,P_2+Q_2) = e(P_1,P_2)\cdot e(P_1,Q_2)
     \end{align*}
     \item[ii.] \emph{Non-degeneracy}, meaning that for all $g_1\in\mathbb{G}_1, g_2\in\mathbb{G}_2$, $e(g_1,g_2)\ne 1_{\mathbb{G}_T}$, the identity element of the group $\mathbb{G}_T$;
     \item[iii.] \emph{ Efficiency}, so that the map $e$ is easy to compute;
@@ -677,7 +679,7 @@ This section lists results of evaluation benchmarks we have run using the Zencod
   \item \textbf{WASM 32bit} on a build made with Emscripten
 \end{itemize}
 
-Our benchmarks provide lab measurements for the 3 main steps in the signature flow: for each of them is reported the time of execution (expressed in $\mu$s) and the size of output (expressed in bytes) in different conditions with a progressive number $N$ of participants (5, 10, 50, 100 signatures).
+Our benchmarks provide lab measurements for the 3 main steps in the signature flow: for each of them is reported the time of execution (expressed in milliseconds) and the size of output (expressed in bytes) in different conditions with a progressive number $\sigma_N$ of participants (5, 10, 50, 100 signatures).
 
 % All results are produced using the free and open source \emph{AGPLv3 license} Zenroom VM long term support release \emph{version 1.2} and its built-in credentials and multidarkroom scenarios using the zencode scripts released in the zencode_multidarkroom distributed examples.
 
@@ -689,16 +691,16 @@ Our benchmarks provide lab measurements for the 3 main steps in the signature fl
 
 \begin{table}[h!]
   \begin{center}
-    \caption{Execution timings on \textbf{X86 64bit} in $\mu$s}
+    \caption{Execution timings on \textbf{X86 64bit} in $ms$}
     \label{tab:table1}
     \begin{tabular}{l|c|c|r}
       \toprule % titles
-      \textbf{N} & \textbf{create} & \textbf{sign} & \textbf{verify}\\
+      \textbf{$\sigma_N$} & \textbf{create} & \textbf{sign} & \textbf{verify}\\
       \midrule
-      2   & 0.0188 & 0.0729 & 0.0405  \\
-      10  & 0.0253 & 0.0730 & 0.0515  \\
-      50  & 0.0410 & 0.1031 & 0.0996  \\
-      100 & 0.0623 & 0.1373 & 0.1619  \\
+      2   & 18.8 & 72.9  & 40.5  \\
+      10  & 25.3 & 73.0  & 51.5  \\
+      50  & 41.0 & 103.1 & 99.6  \\
+      100 & 62.3 & 137.3 & 161.9  \\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
@@ -706,11 +708,11 @@ Our benchmarks provide lab measurements for the 3 main steps in the signature fl
 
 \begin{table}[h!]
   \begin{center}
-    \caption{Execution timings on \textbf{ARM 64bit} in $\mu$s}
+    \caption{Execution timings on \textbf{ARM 64bit} in $ms$}
     \label{tab:table1}
     \begin{tabular}{l|c|c|r}
       \toprule % titles
-      \textbf{N} & \textbf{create} & \textbf{sign} & \textbf{verify}\\
+      \textbf{$\sigma_N$} & \textbf{create} & \textbf{sign} & \textbf{verify}\\
       \midrule
       2   & 0.0605 & 0.2087 & 0.1049  \\
       10  & 0.0685 & 0.2273 & 0.1393  \\
@@ -723,11 +725,11 @@ Our benchmarks provide lab measurements for the 3 main steps in the signature fl
 
 \begin{table}[h!]
   \begin{center}
-    \caption{Execution timings on \textbf{ARM 32bit} in $\mu$s}
+    \caption{Execution timings on \textbf{ARM 32bit} in $ms$}
     \label{tab:table1}
     \begin{tabular}{l|c|c|r}
       \toprule % titles
-      \textbf{N} & \textbf{create} & \textbf{sign} & \textbf{verify}\\
+      \textbf{$\sigma_N$} & \textbf{create} & \textbf{sign} & \textbf{verify}\\
       \midrule
       2   & 0.3333 & 1.0439 & 0.5753  \\
       10  & 0.4358 & 1.1458 & 0.7199  \\
