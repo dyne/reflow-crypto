@@ -233,8 +233,8 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
  [Proof of the verification algorithm:] By using the definitions of the elements involved and exploiting the property of the pairing $e$ we have
 \[
 \begin{split}
-    e(pk,H) &= e(sk\cdot G_2, U) \\
-            &= e(G_2,H)^{sk}\\
+    e(pk,U) &= e(sk\cdot G_2, U) \\
+            &= e(G_2,U)^{sk}\\
             &= e(G_2,sk\cdot U)\\
             &= e(G_2,\sigma)
 \end{split}
@@ -258,17 +258,17 @@ After this phase is terminated, every partecipants involved in the session start
 \]
 Finally, the resulting output will be $\sigma = S_N$, where $N$ is the total number of the signers of the session. In order to verify that $\sigma$ is valid we compute $P = pk_R + \sum_{i=0} ^N pk_i$, where $pk_R = r\cdot G_2$, that works as a public key with respect to the nonce $r$, which instead is kept secret. Verification is then performed by checking if the following identity holds
     \[ 
-    e(P,H) = e(G_2,\sigma)
+    e(P,U) = e(G_2,\sigma)
     \]
 If verification passes without errors it means that $\sigma$ is a valid aggregated signature of $m$.
 \begin{proof}
 For simplicity we will prove the above statement for $N=2$, since the general case can be obtained by an inductive argument. By recalling that $\sigma = R + \sigma_1 + \sigma_2$, $P = pk_R + pk_1 + pk_2$, by using the property of the pairing $e$ we have
 \[
 \begin{split}
-    e(P,H)  &= e(pk_R + pk_1 + pk_2, H) \\
-            &= e((r + sk_1 + sk_2)\cdot G_2,H)\\
-            &= e(G_2,H)^{r + sk_1 + sk_2}\\
-            &= e(G_2,(r + sk_1 + sk_2)\cdot H) \\
+    e(P,U)  &= e(pk_R + pk_1 + pk_2, U) \\
+            &= e((r + sk_1 + sk_2)\cdot G_2,U)\\
+            &= e(G_2,U)^{r + sk_1 + sk_2}\\
+            &= e(G_2,(r + sk_1 + sk_2)\cdot U) \\
             &= e(G_2,R + \sigma_1 + \sigma_2) \\
             &= e(G_2,\sigma)
 \end{split}
@@ -334,8 +334,8 @@ At this point the user will now have a blind credential $\tilde{\sigma} = (c, \t
 \end{align*}
 The user then will have to unblind it using its secret credential key, obtaining $\sigma = (c, s) = (c, \tilde{b} - ck_i (\tilde{a}))$, which will use to prove its identity when signing a message. The procedure is similar to the one seen before with some extra details:
 \begin{itemize}
-    \item \textbf{Setup.} As for the the BLS signature, an elliptic point $H$, associated to the hash of the message to sign, is required as an Unique Identifier (\verb!UID!) for the signing session;
-    \item \textbf{Credential proving.} The user produces two cryptographical objects $\theta$ (containing a new proof $\pi_v$) and $\zeta$ (which is unequivocally associated to $H$) through \verb!prove_cred_uid!, taking as input its own credential $\sigma$, the related secret attribute $c_k$, the authority public key $v_k = (\alpha, \beta)$ and the session point $H$.
+    \item \textbf{Setup.} As for the the BLS signature, an elliptic point $U$, associated to the hash of the message to sign, is required as an Unique Identifier (\verb!UID!) for the signing session;
+    \item \textbf{Credential proving.} The user produces two cryptographical objects $\theta$ (containing a new proof $\pi_v$) and $\zeta$ (which is unequivocally associated to $U$) through \verb!prove_cred_uid!, taking as input its own credential $\sigma$, the related secret attribute $c_k$, the authority public key $v_k = (\alpha, \beta)$ and the session point $U$.
 \end{itemize}
 The new objects $\theta$ and $\zeta$ are derived as follows:
 \begin{itemize}
@@ -372,7 +372,7 @@ The values of $r_h$ and $r_r$ are stored inside $\pi_v$ which will be then sent 
     \begin{align*}
         \widehat{A}_w &= c_h\cdot \kappa + r_r\cdot G_2 + (1 - c_h) \cdot\alpha + r_h \cdot \beta \\
         \widehat{B}_w &= r_r\cdot c' + c_h\cdot \nu \\
-        \widehat{C}_w &= r_h\cdot H + c_h\cdot \zeta
+        \widehat{C}_w &= r_h\cdot U + c_h\cdot \zeta
     \end{align*}
     \item[3.] checking either that
     \begin{multline}\label{challenge pi_v}  \varphi(\{\alpha,\beta,\widehat{A}_w,\widehat{B}_w,\widehat{C}_w\}) = \\ \varphi(\{\alpha,\beta,A_w,B_w,C_w\}) = c_h,
@@ -399,8 +399,8 @@ Actually the predicate $\phi$ in the definition of $pi_v$ can be thought as perf
                     &= (c_h k + w_k - c_h k ) \cdot\gamma + (c_h h + w_h - c_h h)\cdot c) \\
                     &= w_k\cdot\gamma + w_h\cdot c = B_w \\
     \widehat{C}_w   &= c_h\cdot c + r_r\cdot G_1 + r_h\cdot HS \\
-    &= c_h\cdot (r\cdot G_1 + h\cdot HS) + r_r\cdot G_1 + r_h\cdot HS \\
-                    &= (c_h r + r_r) G_1 + (c_h h + r_h) HS \\
+                    &= c_h\cdot (r\cdot G_1 + h\cdot HS) + r_r\cdot G_1 + r_h\cdot HS \\
+                    &= (c_h r + r_r)\cdot G_1 + (c_h h + r_h)\cdot HS \\
                     &= (c_h r + w_r - c_h r)\cdot G_1 + (c_h h + w_h - c_h h)\cdot HS \\
                     &= w_r \cdot G_1 + w_h\cdot HS = C_w
 \end{align*} 
