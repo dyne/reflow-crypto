@@ -82,16 +82,16 @@
 \maketitle
 
 \begin{abstract}
-  Multidarkroom is a novel signature scheme supporting unlinkable
-  signatures by multiple parties authenticated by means of a
-  zero-knowledge credential scheme. Multidarkroom integrates with
-  blockchains to ensure condidentiality, authenticity and availability
-  even when credential issuing authorities are offline. We implement
-  and evaluate a Multidarkroom smart contract for Zenroom and present
-  an application related to multiple anonymous signatures by
-  authenticated parties. Multidarkroom uses short and computationally
-  efficient signatures and credentials whose verification takes the
-  longest time to compute.
+Multidarkroom is a novel signature scheme supporting unlinkable
+signatures by multiple parties authenticated by means of a
+zero-knowledge credential scheme. Multidarkroom integrates with
+blockchains to ensure condidentiality, authenticity and availability
+even when credential issuing authorities are offline. We implement and
+evaluate a Multidarkroom smart contract for Zenroom and present an
+application related to multiple anonymous signatures by authenticated
+parties and their non-interactive verification Multidarkroom uses short
+and computationally efficient authentication credentials and signatures
+application scale linearly over multiple participants.
 \end{abstract}
 
 \vspace{2cm}
@@ -99,65 +99,94 @@
  \end{@twocolumnfalse}
 ]
 
-
-
 \section{Introduction}
 
-Multi-party computation [] applied to the signing process [] allows
-the issuance of signatures without requiring any of the participating
-parties to disclose secret signing keys to each other, nor requires
-the presence of a trusted third-party to receive them and compose the
+Multi-party computation applied to the signing process allows the
+issuance of signatures without requiring any of the participating
+parties to disclose secret signing keys to each other, nor requires the
+presence of a trusted third-party to receive them and compose the
 signatures. However, established schemes have shortcomings. Existing
 protocols do not provide the necessary efficiency, re-randomization or
 blind issuance properties necessary for the application to trustless
-distributed systems. Those managing to implement such privacy
-preserving features are prone to rogue-key attacks \citep{ietf-bls}
-since they cannot grant that signatures are produced by legitimate key
-holders.
+distributed systems. Those managing to implement such privacy preserving
+features are prone to rogue-key attacks \citep{ietf-bls} since they
+cannot grant that signatures are produced by legitimate key holders.
 
-The lack of efficient and privacy-preserving signature schemes impacts
-distributed ledger platforms that support 'smart contracts' as well
-distributed computing architectures where trust is not shared among
-participants, but granted by one or more authorities through
-credential issuance for the generation of non-interactive and
-unlinkable proofs.
+The lack of efficient, scalable and privacy-preserving signature schemes
+impacts distributed ledger technologies that support 'smart contracts'
+as decentralized or federated architectures where trust is not shared
+among all participants, but granted by one or more authorities through
+credential issuance for the generation of non-interactive and unlinkable
+proofs.
 
-Multidarkroom uses short and computationally efficient signatures
-composed of exactly two group elements that are linked to each
-other. The size of the signature remains constant regardless of the
-number of parties that are signing, while the credential size grows
-linearly. Furthermure, after a one-time setup phase where the users
-collect and aggregate a threshold number of verification keys from the
-autorities, the attribute showing and verification O(1) in terms of
-both cryptographic computations and communication of cryptographic
-material, irrespective of the number of authorities.
+Multidarkroom applies to the signature process a mechanism of credential
+issuance by one or more authorities for the generation of
+non-interactive and unlinkable proofs, resulting in short and
+computationally efficient signatures composed of exactly two group
+elements that are linked to each other. The size of the signature
+remains constant regardless of the number of parties that are signing,
+while the credential is verified and discarded after signature
+aggregation. While being signed, duplicates may be avoided by collecting
+unlinkable fingerprints of signing parties, as they would invalidate the
+final result. Before being able to sign, a one-time setup phase is
+required where the signing party collects and aggregates a signed
+credential from one or more autorities. The attribute showing and
+verification are $O(1)$ in terms of both cryptographic computations and
+communication of cryptographic material, irrespective of the number of
+authorities \citep{coconut-2018}.
 
-Our evaluation of the Multiparty primities shows very promising
-results. Verification takes about 10ms, while signing a document is
-about 3 times faster.
+Our evaluation of the Multiparty primitives shows very promising
+results. Session creation takes about $20ms$, while signing $73ms$ and
+verification $40ms$ on average consumer hardware.
+
+\paragraph*{Applications}
+
+Multidarkroom provides a production-ready implementation that is easy to embed in end-to-end encryption applications. By making it possible for multiple parties to anonymously authenticate and produce untraceable signatures, its goal is to leverage privacy-by-design scenarios that minimize the information exchange needed for document authentication.
+
+The participation to a signature will be governed by one or more issuers holding keys for the one-time setup of signature credentials:
+
+\begin{itemize}
+  \item[1.] Participant generates keys and a credential request
+  \item[2.] Issuer signs the credential request
+  \item[3.] Participant stores the credential in its keyring
+\end{itemize}
+
+Following this setup any participant will be able to produce a zero-knowledge proof of possession of the credential, giving access to the signature process.
+
+The base application of Multidarkdroom is obviously the collective signature of digital documents, following such a flow:
+
+\begin{itemize}
+  \item[1.] One may choose a document and decide to indict its signature
+  \item[2.] One selects the participants to the signature and publishes it
+  \item[3.] Participants may chose to add their signature to the document
+  \item[4.] Anyone may verify the document is signed by all and only all participants
+\end{itemize}
+
+Going beyond a single document signing scenario, Multidarkroom can be
+used to implement a material passport for circular economy applications
+\citep{material-passport} to maintain the genealogy of a specific
+product, providing authenticated information about  the whole set of actors, tools, collaborations, agreements, efforts and energy involved in its production, transportation and disposal \citep{reflow-os}.
+
 
 \paragraph*{This paper makes three key contributions}
 
 \begin{itemize}
-\item We describe the signature scheme underlying Multidarkroom,
-  including how key generation, signing and verification operate
-  (Section \ref{sec:signature}). The scheme is an application of the
-  BLS signature scheme \citep{asiacrypt-bls} fitted with features to
-  grant the unlinkability of signatures and to secure it against
-  rogue-key attacks.
-\item We describe the credential scheme underlying Multidarkroom,
-  including how key generation, issuance, aggregation and verification
-  of credentials operate (Section \ref{sec:credential}). The scheme is
-  an application of the Coconut credential scheme \citep{coconut-2018}
-  that is general purpose and can be scaled to a fully distributed
-  threshold issuance that is re-randomizable.
-\item We implement a Zencode scenario of Multidarkroom to be executed
-  on and off-chain by the Zenroom VM, complete with functions for
-  public credential issuance, signature session creation and
-  multi-party non-interactive signing (Section
-  \ref{sec:implementation}). We evaluate the performance and cost of
-  this implementation on on-site and on-line platforms leveraging
-  end-to-end encryption (Section \ref{sec:evaluation}).
+\item We describe the signature scheme underlying Multidarkroom, including how
+  key generation, signing and verification operate (Section
+  \ref{sec:signature}). The scheme is an application of the BLS signature scheme
+  \citep{asiacrypt-bls} fitted with features to grant the unlinkability of
+  signatures and to secure it against rogue-key attacks.
+\item We describe the credential scheme underlying Multidarkroom, including how
+  key generation, issuance, aggregation and verification of credentials operate
+  (Section \ref{sec:credential}). The scheme is an application of the Coconut
+  credential scheme \citep{coconut-2018} that is general purpose and can be
+  scaled to a fully distributed threshold issuance that is re-randomizable.
+\item We implement a Zencode scenario of Multidarkroom to be executed on and
+  off-chain by the Zenroom VM, complete with functions for public credential
+  issuance, signature session creation and multi-party non-interactive signing
+  (Section \ref{sec:implementation}). We evaluate the performance and cost of
+  this implementation on on-site and on-line platforms leveraging end-to-end
+  encryption (Section \ref{sec:evaluation}).
 \end{itemize}
 
 \paragraph*{We will adopt the following notations}
@@ -263,7 +292,7 @@ Step 1. is self-explanatory. Steps 2. and 3. require a bit more effort, in fact 
 c &= r\cdot G_1 + h\cdot HS \\
 s_h &= (a,b) = (k \cdot G_1, k\cdot \gamma + h\cdot c)
 \end{align*}
-where $r$ and $k$ are fresh randomly generated integers and $HS$ is an hard-encoded point on the curve $E$. These two variables are alleged in the credential request $\lambda$ produced in \verb!prepare_blind_sign! and are needed to the verifier to assure the authenticity of the user through the proof $\pi_s$, which requires as input $h, k, r, c$ and $ck_i\cdot G_1$ (called also $\gamma$). The Non-Iteractive Zero Knowlwdge proof (for short NIZK proof) $\pi_s$ generated by the function \verb!blind_sign! is computed as follows:
+where $r$ and $k$ are fresh randomly generated integers and $HS$ is an hard-encoded point on the curve $E$. These two variables are alleged in the credential request $\lambda$ produced in \verb!prepare_blind_sign! and are needed to the verifier to assure the authenticity of the user through the proof $\pi_s$, which requires as input $h, k, r, c$ and $ck_i\cdot G_1$ (called also $\gamma$). The Non-Iteractive Zero Knowledge proof (for short NIZK proof) $\pi_s$ generated by the function \verb!blind_sign! is computed as follows:
 \begin{itemize}
     \item \textbf{Randomization phase.} Three new nonces $w_h, w_k, w_r\in \mathbb{Z}$ are generated, each one related to the input variables $h, k, r$ respectively as we will show soon; 
     \item \textbf{Challenge phase.} The protocol creates three commitment values, namely $A_w, B_w, C_w$ defined as follows
