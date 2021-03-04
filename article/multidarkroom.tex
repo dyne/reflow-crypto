@@ -89,7 +89,7 @@ blockchains to ensure condidentiality, authenticity and availability
 even when credential issuing authorities are offline. We implement and
 evaluate a Multidarkroom smart contract for Zenroom and present an
 application related to multiple anonymous signatures by authenticated
-parties and their non-interactive verification Multidarkroom uses short
+parties and their non-interactive verification. Multidarkroom uses short
 and computationally efficient authentication credentials and signatures
 application scale linearly over multiple participants.
 \end{abstract}
@@ -159,7 +159,7 @@ The base application of Multidarkdroom is obviously the collective signature of 
   \item[1.] One may choose a document and decide to indict a signature
   session linked to it
   \item[2.] One selects the participants and opens the public signature session
-  \item[3.] Participants may chose to add their anonymous signature to the session 
+  \item[3.] Participants may chose to add their signature anonymously to the session 
   \item[4.] Anyone may verify if the document is signed by all and only all participants
 \end{itemize}
 
@@ -196,18 +196,17 @@ guarantees of the quality of information \citep{resources-passport}.
   encryption (Section \ref{sec:evaluation}).
 \end{itemize}
 
-\paragraph*{We will adopt the following notations}
-
+\paragraph*{Notations and assumptions}
+We will adopt the following notations:
 \begin{itemize}
-    \item $\mathbb{F}_p$ is the prime finite field with $p$ elements (i.e. of prime order $p$). In our case the prime is long 383 bits;
-    \item $E$ denotes the (additive) group of points of the curve BLS-383 \citep{bls383} of order $n$ which can be described with the Weierstrass form  $y^2=x^3 + 16$; 
-    \item $E_T$ represents instead the group of points of the twisted curve of BLS-383, with embedding degree $k=12$. The order of this group is also $n$;
+    \item $\mathbb{F}_p$ is the prime finite field with $p$ elements (i.e. of prime order $p$); % In our case the prime is long 383 bits;
+    \item $E$ denotes the (additive) group of points of the curve BLS-383 \citep{bls383} which can be described with the Weierstrass form  $y^2=x^3 + 16$; 
+    \item $E_T$ represents instead the group of points of the twisted curve of BLS-383, with embedding degree $k=12$. The order of this group is the same of that of $E$;
 \end{itemize}
 We also require defining the notion of a cryptographic pairing. Basically it is a function $e: \mathbb{G}_1\times\mathbb{G}_2\to \mathbb{G}_T$, where $\mathbb{G}_1,\mathbb{G}_2$ and $\mathbb{G}_T$ are all groups of same order $n$, such that satisfies the following properties:
 \begin{itemize}
     \item [i.] \emph{Bilinearity}, i.e. given $P_1,Q_1\in\mathbb{G}_1$ and $P_2,Q_2\in\mathbb{G}_2$, we have 
 %    \item [i.] \emph{Bilinearity}, i.e. given $P,Q\in\mathbb{G}_1$ and $R,S\in\mathbb{G}_2$, we have 
-
     \begin{align*}
         e(P_1+Q_1,P_2) = e(P_1,P_2)\cdot e(Q_1,P_2) \\
         e(P_1,P_2+Q_2) = e(P_1,P_2)\cdot e(P_1,Q_2)
@@ -216,7 +215,7 @@ We also require defining the notion of a cryptographic pairing. Basically it is 
     \item[iii.] \emph{ Efficiency}, so that the map $e$ is easy to compute;
     \item[iv. ] $\mathbb{G}_1\ne \mathbb{G}_2$, and moreover, that there exist no efficient homomorphism between $\mathbb{G}_1$ and $\mathbb{G}_2$.
 \end{itemize}
-For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G}_1 = E$, and $\mathbb{G}_T\subset \mathbb{F}_{p^{12}}$ is the subgroup containing the $n$-th roots of unity. Instead $e: E_T  \times E\to \mathbb{G}_T$ is the \emph{Miller pairing}, which in our code is referred as the method \verb!miller(ECP2 P, ECP Q)!. \\
+For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G}_2 = E$, and $\mathbb{G}_T\subset \mathbb{F}_{p^{12}}$ is the subgroup containing the $n$-th roots of unity, where $n$ is the order of the groups $E$ and $E_T$. Instead $e: E_T  \times E\to \mathbb{G}_T$ is the \emph{Miller pairing}, which in our work is encoded as the method \verb!miller(ECP2 P, ECP Q)!. \\
 
 \pagebreak
 
@@ -224,10 +223,10 @@ For the purpose of our protocol we will have $\mathbb{G}_1 = E_T$ and $\mathbb{G
 \section{Signature}
 \label{sec:signature}
 
-A \emph{BLS signature} is a signature scheme whose design exploits a cryptographic pairing. As for other well known algorithm such as ECDSA, it will work following these four main steps:
+A \emph{BLS signature} is a signature scheme whose design exploits a cryptographic pairing. As for other well known algorithm such as ECDSA, it will work following these three main steps:
 \begin{itemize}
     \item  \textbf{Key Generation phase.} For a user who wants to sign a message $m$, a secret key $sk$ is randomically chosen uniformly in $\mathbb{F}_n$, where $n$ is the order of the groups $\mathbb{G}_1, \mathbb{G}_2, \mathbb{G}_T$. The corresponding public key $pk$ is the element $sk\cdot G_2\in E_T$;
-    \item   \textbf{Signing phase.} The message $m$ is first hashed into the $U\in E$, which in our scheme is done by the method \verb!hashtopoint!; the related signature is then given by $\sigma = sk\cdot P$;
+    \item   \textbf{Signing phase.} The message $m$ is first hashed into the point $U\in E$, which in our scheme is done by the method \verb!hashtopoint!; the related signature is then given by $\sigma = sk\cdot /U$;
     \item   \textbf{Verification phase.} For an other user that wants to verify the authenticity and the integrity of the message $m$, it needs to
     \begin{itemize}
         \item [1.] parse $m, pk$ and $\sigma$
@@ -250,7 +249,7 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
 \]
 \end{proof}
 
-BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, with the assumption made on $e$, the signature is produced in a very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained in the context of a multi-party computation using the same message $m$ but different partecipants.
+BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, meaning that (with the assumption made on $e$) signature and verification are obtained in very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$ in a suitable way. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained in the context of a multi-party computation using the same message $m$ but different partecipants.
 
 \paragraph{Session Generation}
 After the key generation step we introduce a new phase called \textbf{session generation}, where the signature is initialized; anyone willing to start a signing session on a message $m$ will create:
@@ -261,29 +260,30 @@ After the key generation step we introduce a new phase called \textbf{session ge
     \item[4.] the first layer of the signature $\sigma \leftarrow r\cdot U$, later to be summed with all other signatures in a multi-party computation setup resulting in the final signature as $\sigma \leftarrow r\cdot U + \sum_i sk_i\cdot U$
     \item[5.] the array of unique fingerprints $\zeta_i$ of each signature resulting from the credential authentication (see section \ref{sec:credential}) 
 \end{itemize}
-After this phase is terminated, every partecipants involved in the session start their own signing phase, producing (from the same message $m$) their respective $\sigma_i$'s. The final signature $\sigma$ is then computed in this way: first of all let us call $\sigma_0 = R$, then supposing $k$ partecipants have already aggrgated their $\sigma_i$, obtaing a partial signature $S_k$, the $(k+1)$-th one will compute
+After this phase is terminated, every partecipants involved in the session start their own signing phase during the session, producing (from the same message $m$) their respective $\sigma_i$'s. The final signature $\sigma$ is then computed in this way: first of all let us call $\sigma_0 = r\cdot U$, then supposing $k$ partecipants have already aggrgated their $\sigma_i$, obtaing a partial signature $S_k$, the $(k+1)$-th one will compute
 \[
   S_{k+1}=S_k+\sigma_k = \sum_{i=0}^{k+1} \sigma_i
 \]
-Finally, the resulting output will be $\sigma = S_N$, where $N$ is the total number of the signers of the session. In order to verify that $\sigma$ is valid we compute $P = pk_R + \sum_{i=0} ^N pk_i$, where $pk_R = r\cdot G_2$, that works as a public key with respect to the nonce $r$, which instead is kept secret. Verification is then performed by checking if the following identity holds
+Finally, the resulting output will be $\sigma = S_N$, where $N$ is the total number of the signers of the session. In order to verify that $\sigma$ is valid we compute $P = R + \sum_{i=0} ^N pk_i$, where $R = r\cdot G_2$, working as a public key with respect to the nonce $r$, which instead is kept secret. Verification is then performed by checking if the following identity holds
     \[ 
     e(P,U) = e(G_2,\sigma)
     \]
 If verification passes without errors it means that $\sigma$ is a valid aggregated signature of $m$.
 \begin{proof}
-For simplicity we will prove the above statement for $N=2$, since the general case can be obtained by an inductive argument. By recalling that $\sigma = R + \sigma_1 + \sigma_2$, $P = pk_R + pk_1 + pk_2$, by using the property of the pairing $e$ we have
+%For simplicity we will prove the above statement for $N=2$, since the general case can be obtained by an inductive argument. 
+By recalling that $\sigma = r\cdot U + \sum_{i=1}^N \sigma_i$, $P = R + \sum_{i=1}^N pk_i$, by using the property of the pairing $e$ we have
 \[
 \begin{split}
-    e(P,U)  &= e(pk_R + pk_1 + pk_2, U) \\
-            &= e((r + sk_1 + sk_2)\cdot G_2,U)\\
-            &= e(G_2,U)^{r + sk_1 + sk_2}\\
-            &= e(G_2,(r + sk_1 + sk_2)\cdot U) \\
-            &= e(G_2,R + \sigma_1 + \sigma_2) \\
+    e(P,U)  &= e(R + \sum_{i=1}^N pk_i, U) \\
+            &= e((r + \sum_{i=1}^N sk_i)\cdot G_2,U)\\
+            &= e(G_2,U)^{r + \sum_{i=1}^N sk_i}\\
+            &= e(G_2,(r + \sum_{i=1}^N sk_i)\cdot U) \\
+            &= e(G_2,r\cdot U + \sum_{i=1}^N \sigma_i) \\
             &= e(G_2,\sigma)
 \end{split}
 \]
 \end{proof} 
-We conclude this section with a final consideration on this feature. We recall that in the generation of the aggregated signature $\sigma$ we used as a starting point the variable $R = r\cdot G_2$, but in literature it is also common to find instead simply the base point $G_2$. The choice of randomizing it (providing that the random number generator acts as an oracle) helps in preventing replay attacks, since the signature generated by the process is linked to the session in which is produced, for if an attacker managed to get some information from $\sigma$, it would be difficult to use it in order to forge new signatures.
+We conclude this section with a final consideration on this feature. We recall that in the generation of the aggregated signature $\sigma$ we used as a starting point the variable $\sigma_0 = r\cdot U$, but in literature it is also common to find instead simply the base point $G_2$. The choice of randomizing it (providing that the random number generator acts as an oracle) helps in preventing replay attacks, since the signature generated by the process is linked to the session in which is produced, for if an attacker managed to get some information from $\sigma$, it would be difficult to use it in order to forge new signatures.
 
 \pagebreak
 
@@ -292,16 +292,16 @@ We conclude this section with a final consideration on this feature. We recall t
 
 Following the guidelines of Coconut, the credentials issuing scheme works as follows:
 \begin{itemize}
-\item [1.] the issuer generates its own keypair $(s_k,v_k)$, where $s_k=(x,y)\in\mathbb{Z}^2$ is the pair of secret scalars (the signing key) and $v_k=(\alpha, \beta)=(x\cdot G_2,y\cdot G_2)$ is the verifying key, made by the related pair of public points over the twisted elliptic curve of BLS-383 of embedding degree $k=12$; 
-\item [2.] the user $i$, with its respective keys $(sk_i, PK_i)$ make a credential request on its secret attribute $ck_i\in\mathbf{Z}$ to the issuer, sending $\lambda$ which contains a zero-knowledge proof $\pi_s$ of the authenticity of user $i$; 
+\item [1.] the issuer generates its own keypair $(s_k,v_k)$, where $s_k=(x,y)\in\mathbb{Z}^2$ is the pair of secret scalars (the signing key) and $v_k=(\alpha, \beta)=(x\cdot G_2,y\cdot G_2)$ is the verifying key, made by the related pair of public points over $E_T$; 
+\item [2.] the user $i$, with its respective keys $(sk_i, PK_i)$ make a credential request on its secret attribute $ck_i\in\mathbb{Z}$ to the issuer, represented by $\lambda$ which contains a zero-knowledge proof $\pi_s$ of the authenticity of user $i$; 
 \item[3.] the issuer, after having received $\lambda$, verifies the proof $\pi_s$ at its inside, and if it passes, then releases to user $i$ a credential $\tilde{\sigma}$ signed used its own key $sk$.
 \end{itemize}
-Step 1. is self-explanatory. Steps 2. and 3. require a bit more effort, in fact in order to build a valid request $\lambda$, and so also a valid proof $\pi_s$, first of all the user must produce an hash digest $H(ck_i)$ for the attribute $ck_i$, that we call $h$, then computes two more variables $c$ and $s_h$ defined as
+Step 1. is self-explanatory. Steps 2. and 3. require a bit more effort, in fact in order to build a valid request $\lambda$, and so also a valid proof $\pi_s$, first of all the user must produce an hash digest for the attribute $ck_i$, that we call $h$, then computes two more variables $c$ and $s_h$ defined as
 \begin{align*}
 c &= r\cdot G_1 + h\cdot HS \\
 s_h &= (a,b) = (k \cdot G_1, k\cdot \gamma + h\cdot c)
 \end{align*}
-where $r$ and $k$ are fresh randomly generated integers and $HS$ is an hard-encoded point on the curve $E$. These two variables are alleged in the credential request $\lambda$ produced in \verb!prepare_blind_sign! and are needed to the verifier to assure the authenticity of the user through the proof $\pi_s$, which requires as input $h, k, r, c$ and $ck_i\cdot G_1$ (called also $\gamma$). The Non-Iteractive Zero Knowledge proof (for short NIZK proof) $\pi_s$ generated by the function \verb!blind_sign! is computed as follows:
+where $r$ and $k$ are fresh randomly generated integers, $HS$ is an hard-encoded point on the curve $E$, and $\gamma = ck_i\cdot G_1$. These two variables are alleged in the credential request $\lambda$ produced in \verb!prepare_blind_sign! and are needed to the verifier to assure the authenticity of the user through the proof $\pi_s$, which requires as input $h, k, r, c$. The Non-Iteractive Zero Knowledge proof (for short NIZK proof) $\pi_s$ generated by the function \verb!blind_sign! is computed as follows:
 \begin{itemize}
     \item \textbf{Randomization phase.} Three new nonces $w_h, w_k, w_r\in \mathbb{Z}$ are generated, each one related to the input variables $h, k, r$ respectively as we will show soon; 
     \item \textbf{Challenge phase.} The protocol creates three commitment values, namely $A_w, B_w, C_w$ defined as follows
@@ -318,7 +318,7 @@ where $r$ and $k$ are fresh randomly generated integers and $HS$ is an hard-enco
         r_r &= w_r - c_h r
     \end{align*}
 \end{itemize}
-So basically, the proof $\pi_s$ contains the three response variables $r_h, r_k, r_r$ and also the commitment value $c_h$, that can be used for a predicate $\phi$ which is true when computed on $m$. Once the verifier receives the request $\lambda$, in order to check if the proof is valid it should be able to reconstruct  $A_w, B_w, C_w$ by doing these computations,
+So basically the proof $\pi_s$ contains the three response variables $r_h, r_k, r_r$ and also the commitment value $c_h$, that can be used for a predicate $\phi$ which is true when computed on $h$. Once the verifier receives the request $\lambda$, in order to check if the proof is valid it should be able to reconstruct  $A_w, B_w, C_w$ by doing these computations,
 \begin{align*}
 \widehat{A}_w &= c_h\cdot a + r_k\cdot G_1 \\
 \widehat{B}_w &= c_h\cdot b + r_k\cdot \gamma + r_h\cdot c \\
@@ -341,7 +341,7 @@ At this point the user will now have a blind credential $\tilde{\sigma} = (c, \t
 \tilde{a} &= y \cdot a \\
 \tilde{b} &= x\cdot c + y\cdot b
 \end{align*}
-The user then will have to unblind it using its secret credential key, obtaining $\sigma = (c, s) = (c, \tilde{b} - ck_i (\tilde{a}))$, which will use to prove its identity when signing a message. The procedure is similar to the one seen before with some extra details:
+The user then will have to unblind it using its secret credential key, obtaining $\sigma_{ck} = (c, s) = (c, \tilde{b} - ck_i (\tilde{a}))$, which will use to prove its identity when signing a message. The procedure is similar to the one seen before with some extra details:
 \begin{itemize}
     \item \textbf{Setup.} As for the the BLS signature, an elliptic point $U$, associated to the hash of the message to sign, is required as an Unique Identifier (\verb!UID!) for the signing session;
     \item \textbf{Credential proving.} The user produces two cryptographical objects $\theta$ (containing a new proof $\pi_v$) and $\zeta$ (which is unequivocally associated to $U$) through \verb!prove_cred_uid!, taking as input its own credential $\sigma$, the related secret attribute $c_k$, the authority public key $v_k = (\alpha, \beta)$ and the session point $U$.
@@ -349,7 +349,7 @@ The user then will have to unblind it using its secret credential key, obtaining
 The new objects $\theta$ and $\zeta$ are derived as follows:
 \begin{itemize}
     \item as before the user hashes $ck$ into $h$, and this time generates two random values $r$ and $r'$;\\
-    \item next, it randomizes its credential $\sigma$ into $\sigma' = (c', s') = (r'\cdot c, r'\cdot s)$ and then computes two elliptic curve points $\kappa$ and $\nu$ as
+    \item next, it randomizes its credential $\sigma_{ck}$ into $\sigma_{ck}' = (c', s') = (r'\cdot c, r'\cdot s)$ and then computes two elliptic curve points $\kappa$ and $\nu$ as
     \begin{align*}
         \kappa &= \alpha + h\cdot\beta + r\cdot G_2\\
         \nu &= r \cdot c'
@@ -390,13 +390,8 @@ The values of $r_h$ and $r_r$ are stored inside $\pi_v$ which will be then sent 
     \begin{equation}\label{miller}
     e(\kappa, c') = e(G_2, s' + \nu)
     \end{equation}
-    where $e$ is the Miller pairing function defined as
-    \[
-    e: E_T \times E \to \mathbb{F}_{p^{12}}
-    \]
-
-\end{itemize}
-Actually the predicate $\phi$ in the definition of $pi_v$ can be thought as performing steps 2. and 3. and, if any of these fails the protocol will abort returning a failure, otherwise verification passes and the user can finally produce the signature.\\
+    \end{itemize}
+Actually the predicate $\phi$ in the definition of $\pi_v$ can be thought as performing steps 2. and 3. and, if any of these fails the protocol will abort returning a failure, otherwise verification passes and the user can finally produce the signature.\\
 \paragraph{Proof of the verification algorithms.} We now show for the proof $\pi_s$ that actually by using the responses $r_h, r_k$ and $r_r$, together with $c_h$ and the other parameters inside $\lambda$, i.e. $s=(a,b), c$ and $\gamma$, using also the hard coded point $HS$, it is possible to reconstruct the commitments $A_w, B_w, C_w$:
 \begin{align*}
     \widehat{A}_w   &= c_h\cdot a + r_k\cdot G_1 = c_h k \cdot G_1 + r_k \cdot G_1 \\
@@ -405,7 +400,7 @@ Actually the predicate $\phi$ in the definition of $pi_v$ can be thought as perf
     \widehat{B}_w   &= c_h\cdot b + r_k\cdot \gamma + r_h\cdot c \\
                     &= c_h\cdot (k\cdot \gamma + h\cdot c) + r_k\cdot\gamma + r_h\cdot c \\
                     &= (c_h k + r_k) \cdot\gamma + (c_h h + r_h\cdot c) \\
-                    &= (c_h k + w_k - c_h k ) \cdot\gamma + (c_h h + w_h - c_h h)\cdot c) \\
+                    &= (c_h k + w_k - c_h k ) \cdot\gamma + (c_h h + w_h - c_h h)\cdot c \\
                     &= w_k\cdot\gamma + w_h\cdot c = B_w \\
     \widehat{C}_w   &= c_h\cdot c + r_r\cdot G_1 + r_h\cdot HS \\
                     &= c_h\cdot (r\cdot G_1 + h\cdot HS) + r_r\cdot G_1 + r_h\cdot HS \\
