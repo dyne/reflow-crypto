@@ -16,7 +16,7 @@
 \usepackage{amsthm}
 \usepackage{enumitem}
 \setlist[itemize]{align=parleft,left=0pt..1em}
-\setlist[enumerate]{align=parleft,left=0pt..1em}
+\setlist[enumerate]{align=parleft,left=0pt..1.5em,label=\large\protect\textcircled{\small\arabic*}}
 \usepackage[font=scriptsize]{caption}
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
@@ -25,7 +25,9 @@
 \usepackage{graphicx}
 \usepackage{natbib}
 \usepackage{doi}
-\usepackage{listings,xcolor}
+\usepackage{inconsolata}
+\usepackage[x11names]{xcolor}
+\usepackage{listings}
 \usepackage{booktabs} % For prettier tables
 
 \lstdefinestyle{lua}{
@@ -35,6 +37,42 @@
   stringstyle=\color{blue},
   commentstyle=\color{black!50}
 }
+% solarized
+\lstset{
+    % How/what to match
+    sensitive=false,
+    % Extra margin on line (align with paragraph)
+    xleftmargin=\parindent,
+    % Put extra space under caption
+    belowcaptionskip=1\baselineskip,
+    % Break long lines into multiple lines?
+    breaklines=true,
+    % Show a character for spaces?
+    showstringspaces=false,
+    tabsize=2
+}
+\lstdefinelanguage{Zencode}{
+	morekeywords = {
+		Given,
+		When,
+		Then,
+		And,
+		Scenario,
+		Rule
+	},
+	sensitive=true,
+	morecomment=[l]{\#},
+	morestring=[b]'
+}
+\lstdefinestyle{zencode}{
+  language=Zencode,
+  backgroundcolor=\color{white},
+  basicstyle=\ttfamily,
+  keywordstyle=\color{blue},
+  stringstyle=\color{magenta},
+  commentstyle=\color{black!50}
+}
+
 
 \title{Multidarkroom}
 
@@ -139,47 +177,61 @@ Our evaluation of the Multiparty primitives shows very promising
 results. Session creation takes about $20ms$, while signing $73ms$ and
 verification $40ms$ on average consumer hardware.
 
-\paragraph*{Applications}
+\subsection*{Applications}
 
 Multidarkroom provides a production-ready implementation that is easy to embed in end-to-end encryption applications. By making it possible for multiple parties to anonymously authenticate and produce untraceable signatures, its goal is to leverage privacy-by-design scenarios that minimize the information exchange needed for document authentication.
 
 The participation to a signature will be governed by one or more issuers holding keys for the one-time setup of signature credentials:
 
-\begin{itemize}
-  \item[1.] Participant generates keys and a credential request
-  \item[2.] Issuer signs the credential request
-  \item[3.] Participant stores the credential in its keyring
-\end{itemize}
+\begin{enumerate} % [label=\large\protect\textcircled{\small\arabic*}]
+  \item Participant generates keys and a credential request
+  \item Issuer signs the credential request
+  \item Participant stores the credential in its keyring
+\end{enumerate}
 
-Following this setup any participant will be able to produce a zero-knowledge proof of possession of the credential, giving access to the signature process.
+% \begin{itemize}
+%   \item[\circled{1}] Participant generates keys and a credential request
+%   \item[\circled{2}] Issuer signs the credential request
+%   \item[\circled{3}] Participant stores the credential in its keyring
+% \end{itemize}
+
+Following this setup any participant will be able to produce a zero-knowledge proof of possession of the credential. The proof of possession will be a requirement when participating to any signature process.
 
 The base application of Multidarkdroom is obviously the collective
 signature of digital documents, following such a flow:
 
-\begin{itemize}
-  \item[1.] One may choose a document and decide to indict a signature
-  session linked to it
-  \item[2.] One selects the participants and opens the public signature session
-  \item[3.] Participants may chose to add their signature anonymously to the session 
-  \item[4.] Anyone may verify if the document is signed by all and only all participants
-\end{itemize}
+\begin{enumerate}
+  \item One may choose a document and decide to indict a signature session
+  \item One selects the participants and the issuer credential required to participate to the signature session
+  \item One then publishes the signature session without disclosing the identity of participants
+  \item Participants may be informed about the signature session and may chose to add their signature anonymously 
+  \item Anyone may be informed about the signature session linked to the document and be able to verify if signed by all and only all participants without knowing their identity
+\end{enumerate}
 
+There are several configurable aspects in this flow that may or may not
+disclose bits information as who has indicted the signature session or
+what documents are linked to signatures, however the bottom-line is that
+the only identity that really needs to be public is that of the
+credential issuer. 
+
+\paragraph*{Need to Know.}
 Moving further in envisioning the possibilities opened by Multidarkroom
 is important to state the aggregability of signatures into compact
 multi-signatures, a core feature of our BLS based signature scheme
-\textbf{compact-multisig}. The base implementation exploiting this
+\citep{compact-multisig}. The base implementation exploiting this
 feature is that of a signature scheme for a \textbf{single document
 split in separate sections to be signed by different participants}: all
 the signatures can be later aggregated in a single one proving the whole
 document has been signed by all participants, without being disclosed to
 all of them in its entirety. This application helps to enforce the
 principles of need-to-know and least privilege to the access of
-information \textbf{info-protection} and is useful for the realization
+information \citep{info-protection} and is useful for the realization
 of privacy-aware applications in various sectors, for instance for
 medical and risk mitigation analysis.
 
+\paragraph*{Material Passport.}
 Drawing on feature of multiple signature aggregation, Multidarkroom can
-be used to implement a \textbf{material passport} for circular economy
+be used to implement a {material passport} for circular economy
 applications \citep{material-passport} to maintain the genealogy of a
 specific product, providing authenticated information about  the whole
 set of actors, tools, collaborations, agreements, efforts and energy
@@ -200,17 +252,16 @@ signers. The product signature will then be the sum of all materials
 composing or consumed for it and it will be the athenticated and
 immutable track record of all materials composing the product.
 
-\begin{itemize}
-  \item[1.] One may choose a list of signed materials to compose them in a product
-  \item[2.] One aggregates all signatures of the materials into the product signature
-  \item[3.] One saves a list of all UIDs for each material along with its information
-  \item[5.] One may publish the signed material passport created this way 
-  \item[6.] Anyone may verify the integrity of the material passport
-\end{itemize}
+\begin{enumerate}
+  \item One may choose a list of signed materials to compose them in a product
+  \item One aggregates all signatures of the materials into the product signature
+  \item One saves a list of all UIDs for each material along with its information
+  \item One may publish the signed material passport created this way 
+  \item Anyone may verify the integrity of the material passport
+\end{enumerate}
 
-In a very similar 
 
-\paragraph*{This paper makes three key contributions}
+\subsection*{This paper makes three key contributions}
 
 \begin{itemize}
 \item We describe the signature scheme underlying Multidarkroom, including how
@@ -231,7 +282,8 @@ In a very similar
   encryption (Section \ref{sec:evaluation}).
 \end{itemize}
 
-\paragraph*{Notations and assumptions}
+\subsection*{Notations and assumptions}
+
 We will adopt the following notations:
 \begin{itemize}
     \item $\mathbb{F}_p$ is the prime finite field with $p$ elements (i.e. of prime order $p$); % In our case the prime is long 383 bits;
@@ -289,7 +341,8 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
 
 BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, meaning that (with the assumption made on $e$) signature and verification are obtained in very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$ in a suitable way. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained in the context of a multi-party computation using the same message $m$ but different partecipants.
 
-\paragraph{Session Generation}
+\subsection*{Session Generation}
+
 After the key generation step we introduce a new phase called \textbf{session generation}, where the signature is initialized; anyone willing to start a signing session on a message $m$ will create:
 \begin{itemize}
     \item[1.] a random $r$ and its corresponding point $R = r\cdot G_2$
@@ -430,8 +483,11 @@ The values of $r_h$ and $r_r$ are stored inside $\pi_v$ which will be then sent 
     e(\kappa, c') = e(G_2, s' + \nu)
     \end{equation}
     \end{itemize}
-Actually the predicate $\phi$ in the definition of $\pi_v$ can be thought as performing steps 2. and 3. and, if any of these fails the protocol will abort returning a failure, otherwise verification passes and the user can finally produce the signature.\\
-\paragraph{Proof of the verification algorithms.} We now show for the proof $\pi_s$ that actually by using the responses $r_h, r_k$ and $r_r$, together with $c_h$ and the other parameters inside $\lambda$, i.e. $s=(a,b), c$ and $\gamma$, using also the hard coded point $HS$, it is possible to reconstruct the commitments $A_w, B_w, C_w$:
+Actually the predicate $\phi$ in the definition of $\pi_v$ can be thought as performing steps 2. and 3. and, if any of these fails the protocol will abort returning a failure, otherwise verification passes and the user can finally produce the signature.
+
+\subsection*{Proof of the verification algorithms.}
+
+We now show for the proof $\pi_s$ that actually by using the responses $r_h, r_k$ and $r_r$, together with $c_h$ and the other parameters inside $\lambda$, i.e. $s=(a,b), c$ and $\gamma$, using also the hard coded point $HS$, it is possible to reconstruct the commitments $A_w, B_w, C_w$:
 \begin{align*}
     \widehat{A}_w   &= c_h\cdot a + r_k\cdot G_1 = c_h k \cdot G_1 + r_k \cdot G_1 \\
                     &= (c_h k + r_k)\cdot G_1 = (c_h k + w_k - c_h k)\cdot G_1 \\
@@ -482,11 +538,51 @@ So, at the end
 and (\ref{miller}) is finally proved. 
 \qed
 
-\paragraph{Security considerations.} 
+\subsection*{Security considerations.} 
 
-As mentioned in Coconut \citep{coconut-2018}, BLS signatures and the proof system obtained with credentials are considered secure by assuming the existence of random oracles \citep{random-oracle}, together with the decisional Diffie-Hellman Problem (DDH) \citep{DDH-problem}, the external Diffie-Hellman Problem (XDH), and with the Lysyanskaya-Rivest-Sahai-Wol Problem (LRSW) \citep{lrsw-assumption}, which are connected to the Discrete Logarithm. In fact, under these assumptions, we have that our protocol satisfies uforgeability, blindness, and unlinkability.
+As mentioned in Coconut \citep{coconut-2018}, BLS signatures and the
+proof system obtained with credentials are considered secure by assuming
+the existence of random oracles \citep{random-oracle}, together with the
+decisional Diffie-Hellman Problem (DDH) \citep{DDH-problem}, the
+external Diffie-Hellman Problem (XDH), and with the
+Lysyanskaya-Rivest-Sahai-Wol Problem (LRSW) \citep{lrsw-assumption},
+which are connected to the Discrete Logarithm. In fact, under these
+assumptions, we have that our protocol satisfies uforgeability,
+blindness, and unlinkability.
 
-\pagebreak
+There are reserves about the maturity of pairing-based ellipcic curve
+cryptography and despite various efforts to measure its security and
+design curve parameters that raise it, it is reasonable to consider this
+as a pioneering field of cryptography, in contrast to well tested
+standards as RSA. One uncertainty shared with RSA is that of the future
+growth of quantum-computing technologies that may be able to overcome
+the Discrete Logarithmic assumptions by qualitatively different
+compuational means.
+
+Multidarkroom then may be considered vulnerable to quantum-computing
+attacks, as well hard to patch, because the pairing-based design sits at
+its core with the adoption of ATE / Miller loop pairing of curves in
+twisted space, a practice that is not covered by research on
+quantum-proof algorithms and will eventually need more time to be
+addressed; however this is all speculative reasoning on what we can
+expect from the future.
+
+The Multidarkroom implementation we are presenting in this paper and
+that we have published as a Zenroom scenario ready to use is based on
+the BLS383 curve \citep{bls383} that in the current implementation
+provided by the AMCL library has shown to pass all lab-tests regarding
+pairing properties, a posiive result that is not shared with the
+slightly different BLS381-12 curve adopted by ETH2.0. Debating the
+choice of BLS381 is well beyond the scope of this paper, but is worth
+mentioning that our lab-tests have proved also the BLS461 curve to work
+in Multidarkroom: it is based on a 461 bit prime and hence upgrades our
+implementation to 128 bit security \citep{updating-key-pairings} against
+attacks looking for discrete logs on elliptic curves
+\citep{discrete-log-attack}.
+
+% TODO:
+
+At last the complexity and flexibility of Multidarkroom in its different applications, its optional use of fingerprint lists, multiple UIDs saved from aggregation and other features covering the different applications also represent a security risk in the technical integration phase. We believe that the adoption of Zenroom and the creation of a Zencode scenario addresses well this vulnerability by providing an easy to use integrated development environment (apiroom.net) and a test-bed for the design of different scenarios of application for Multidarkroom that can be deployed correctly granting end-to-end encryption and data minimization according to privacy by design guidelines. %decode priv by design}. 
 
 \section{Implementation}
 \label{sec:implementation}
@@ -496,28 +592,23 @@ As mentioned in Coconut \citep{coconut-2018}, BLS signatures and the proof syste
 In this section we illustrate our implementation of Multidarkroom
 keygen, sign and verify operations outlining for each:
 
-\begin{enumerate}
+\begin{itemize}
   \item the communication sequence diagram (figure)
-  \item the Zenroom code (Lua dialect script)
+ % \item the Zenroom code (Lua dialect script)
   \item the Zencode statements
-\end{enumerate}
+\end{itemize}
 
 In addition to the above, a Setup operation will be briefly
 illustrated without the sequence diagram, as it includes the local
 creation of a keypair for the Issuer who will validate the
 credentials.
 
-\textbf{Setup:} Generate the Issuer keys for credential signature
+\paragraph*{Setup:} Generate the Issuer keys for credential signature
 
-\begin{lstlisting}[style=lua]
- x = INT.random()
- y = INT.random()
- sk = { x = x,
-        y = y  }
- vk = { alpha = G2 * x,
-        beta  = G2 * y  }
- return { sign = sk,
-          verify = vk }
+\begin{lstlisting}[style=zencode]
+Given I am 'The Issuer'
+When I create the issuer keypair
+Then print my 'issuer keypair'  
 \end{lstlisting}
 
 Executed by the Zencode utterance:

@@ -1,16 +1,26 @@
 
-## Description:
+# Latex setup description
 
 The project hosts an aesthetic and simple LaTeX style suitable for "preprint" publications such as arXiv and bio-arXiv, etc. 
-It is based on the [**nips_2018.sty**](https://media.nips.cc/Conferences/NIPS2018/Styles/nips_2018.sty) style.
+It is based on the [**nips_2018.sty**](https://media.nips.cc/Conferences/NIPS2018/Styles/nips_2018.sty) style, with many changes to support dual column, Lua and Zencode syntaxt highlight, stylish tables and some more features visible in the Multidarkroom paper.
 
-This styling maintains the esthetic of NIPS but adding and changing features to make it (IMO) even better and more suitable for preprints.
-The result looks fairly different from NIPS style so that readers won't get confused to think that the preprint was published in NIPS. 
+## Dependencies
 
-### Why NIPS? 
-Because the NIPS styling is a comfortable single column format that is very esthetic and convenient for reading.
+On a Devuan 3.1 Beowulf:
 
-## Usage:
+- texlive-extra-utils
+- texlive-fonts-extra
+- texlive-latex-extra
+- texlive-generic-extra
+
+Docker is needed for mermaidjs rendering to file.
+
+## Build
+
+- make mermaid
+- make
+
+## Usage
 1. Use Document class **article**. 
 2. Copy **arxiv.sty** to the folder containing your tex file.
 3. add `\usepackage{arxiv}` after `\documentclass{article}`.
@@ -20,9 +30,9 @@ See **template.tex**
 
 ## Project files:
 1. **arxiv.sty** - the style file.
-2. **template.tex** - a sample template that uses the **arxiv style**.
-3. **references.bib** - the bibliography source file for template.tex.
-4. **template.pdf** - a sample output of the template file that demonstrated the design provided by the arxiv style.
+2. **multidarkroom.tex** - article that uses the **arxiv style**.
+3. **references.bib** - the bibliography source file for multidarkroom.tex.
+4. **multidarkroom.pdf** - the output of the multidarkroom article in arxiv style.
 
 
 ## Handling References when submitting to arXiv.org
@@ -42,8 +52,6 @@ Below are the commands that should be run in the project folder:
 
 
 ## General Notes:
-1. For help, comments, praises, bug reporting or change requests, you can contact the author at: kourgeorge/at/gmail.com.
-2. You can use, redistribute and do whatever with this project, however, the author takes no responsibility on whatever usage of this project.
-3. If you start another project based on this project, it would be nice to mention/link to this project.
-4. You are very welcome to contribute to this project.
-5. A good looking 2 column template can be found in https://github.com/brenhinkeller/preprint-template.tex.
+1. This Latex setup is based on work by kourgeorge/at/gmail.com and extended by jaromil/at/dyne.org
+2. If you start another project based on this project, one needs to mention/link to this project.
+3. Another good looking 2 column template can be found in https://github.com/brenhinkeller/preprint-template.tex.
