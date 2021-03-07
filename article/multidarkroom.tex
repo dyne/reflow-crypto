@@ -153,7 +153,8 @@ The participation to a signature will be governed by one or more issuers holding
 
 Following this setup any participant will be able to produce a zero-knowledge proof of possession of the credential, giving access to the signature process.
 
-The base application of Multidarkdroom is obviously the collective signature of digital documents, following such a flow:
+The base application of Multidarkdroom is obviously the collective
+signature of digital documents, following such a flow:
 
 \begin{itemize}
   \item[1.] One may choose a document and decide to indict a signature
@@ -163,10 +164,27 @@ The base application of Multidarkdroom is obviously the collective signature of 
   \item[4.] Anyone may verify if the document is signed by all and only all participants
 \end{itemize}
 
-Going beyond a single document signing scenario, Multidarkroom can be
-used to implement a material passport for circular economy applications
-\citep{material-passport} to maintain the genealogy of a specific
-product, providing authenticated information about  the whole set of actors, tools, collaborations, agreements, efforts and energy involved in its production, transportation and disposal \citep{reflow-os}.
+Moving further in envisioning the possibilities opened by Multidarkroom
+is important to state the aggregability of signatures into compact
+multi-signatures, a core feature of our BLS based signature scheme
+\textbf{compact-multisig}. The base implementation exploiting this
+feature is that of a signature scheme for a \textbf{single document
+split in separate sections to be signed by different participants}: all
+the signatures can be later aggregated in a single one proving the whole
+document has been signed by all participants, without being disclosed to
+all of them in its entirety. This application helps to enforce the
+principles of need-to-know and least privilege to the access of
+information \textbf{info-protection} and is useful for the realization
+of privacy-aware applications in various sectors, for instance for
+medical and risk mitigation analysis.
+
+Drawing on feature of multiple signature aggregation, Multidarkroom can
+be used to implement a \textbf{material passport} for circular economy
+applications \citep{material-passport} to maintain the genealogy of a
+specific product, providing authenticated information about  the whole
+set of actors, tools, collaborations, agreements, efforts and energy
+involved in its production, transportation and disposal
+\citep{reflow-os}.
 
 The provision of the information that forms the content of the material
 passport should be done by every actor in the supply chain and among the
@@ -174,6 +192,23 @@ most important technical necessities for such an application are the
 confidentiality issues regarding access to information and the
 guarantees of the quality of information \citep{resources-passport}.
 
+Multidarkroom's unlinkability of credentials and signatures the privacy
+requirement for the material passport, while the possibility to
+aggregate its signatures allows to group multiple signatures into a
+single compact one, without requiring any interaction with the previous
+signers. The product signature will then be the sum of all materials
+composing or consumed for it and it will be the athenticated and
+immutable track record of all materials composing the product.
+
+\begin{itemize}
+  \item[1.] One may choose a list of signed materials to compose them in a product
+  \item[2.] One aggregates all signatures of the materials into the product signature
+  \item[3.] One saves a list of all UIDs for each material along with its information
+  \item[5.] One may publish the signed material passport created this way 
+  \item[6.] Anyone may verify the integrity of the material passport
+\end{itemize}
+
+In a very similar 
 
 \paragraph*{This paper makes three key contributions}
 
