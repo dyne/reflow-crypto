@@ -21,55 +21,55 @@ G1 = ECP.generator()
 G2 = ECP2.generator()
 
 ZEN.add_schema({
-    verifier = function(obj)
+    multidarkroom_verifier = function(obj)
         -- not using ZEN.get because verifier is aggregable just like
         -- public_key_f keys in ECDH. TODO: semantic distinction
         -- using a function
         return ECP2.new(CONF.input.encoding.fun(obj))
     end,
-    keypair = function(obj)
+    multidarkroom_keypair = function(obj)
         local sk = ZEN.get(obj, 'signing_key', INT.new)
         local ck = ZEN.get(obj, 'credential_key', INT.new)
         return {signing_key = sk, credential_key = ck}
     end,
-    issuer_key = function(obj)
-        return {x = ZEN.get(obj, 'x', INT.new), y = ZEN.get(obj, 'y', INT.new)}
-    end,
-    credential = function(obj)
-        return {
-            alpha = ZEN.get(obj, 'alpha', ECP2.new),
-            beta = ZEN.get(obj, 'beta', ECP2.new)
-        }
-    end,
-    verified_credential = function(obj)
-        return {h = ZEN.get(obj, 'h', ECP.new), s = ZEN.get(obj, 's', ECP.new)}
-    end,
-    issuance_request = function(obj)
-        local req = {
-            sign = {
-                a = ZEN.get(obj.sign, 'a', ECP.new),
-                b = ZEN.get(obj.sign, 'b', ECP.new)
-            },
-            pi_s = {
-                rr = ZEN.get(obj.pi_s, 'rr', INT.new),
-                rm = ZEN.get(obj.pi_s, 'rm', INT.new),
-                rk = ZEN.get(obj.pi_s, 'rk', INT.new),
-                commit = ZEN.get(obj.pi_s, 'commit', INT.new)
-            },
-            commit = ZEN.get(obj, 'commit', ECP.new),
-            public = ZEN.get(obj, 'public', ECP.new)
-        }
-        ZEN.assert(ABC.verify_pi_s(req), "Error in credential request:" ..
-                       " proof is invalid (verify_pi_s)")
-        return req
-    end,
-    issuer_signature = function(obj)
-        return {
-            h = ZEN.get(obj, 'h', ECP.new),
-            b_tilde = ZEN.get(obj, 'b_tilde', ECP.new),
-            a_tilde = ZEN.get(obj, 'a_tilde', ECP.new)
-        }
-    end
+    -- issuer_key = function(obj)
+    --     return {x = ZEN.get(obj, 'x', INT.new), y = ZEN.get(obj, 'y', INT.new)}
+    -- end,
+    -- -- credential = function(obj)
+    --     return {
+    --         alpha = ZEN.get(obj, 'alpha', ECP2.new),
+    --         beta = ZEN.get(obj, 'beta', ECP2.new)
+    --     }
+    -- end,
+    -- -- verified_credential = function(obj)
+    --     return {h = ZEN.get(obj, 'h', ECP.new), s = ZEN.get(obj, 's', ECP.new)}
+    -- end,
+    -- issuance_request = function(obj)
+    --     local req = {
+    --         sign = {
+    --             a = ZEN.get(obj.sign, 'a', ECP.new),
+    --             b = ZEN.get(obj.sign, 'b', ECP.new)
+    --         },
+    --         pi_s = {
+    --             rr = ZEN.get(obj.pi_s, 'rr', INT.new),
+    --             rm = ZEN.get(obj.pi_s, 'rm', INT.new),
+    --             rk = ZEN.get(obj.pi_s, 'rk', INT.new),
+    --             commit = ZEN.get(obj.pi_s, 'commit', INT.new)
+    --         },
+    --         commit = ZEN.get(obj, 'commit', ECP.new),
+    --         public = ZEN.get(obj, 'public', ECP.new)
+    --     }
+    --     ZEN.assert(ABC.verify_pi_s(req), "Error in credential request:" ..
+    --                    " proof is invalid (verify_pi_s)")
+    --     return req
+    -- end,
+    -- issuer_signature = function(obj)
+    --     return {
+    --         h = ZEN.get(obj, 'h', ECP.new),
+    --         b_tilde = ZEN.get(obj, 'b_tilde', ECP.new),
+    --         a_tilde = ZEN.get(obj, 'a_tilde', ECP.new)
+    --     }
+    -- end
 })
 
 function credential_proof_f(o)
@@ -116,59 +116,51 @@ ZEN.add_schema({
     end
 })
 
-local function have(o) ZEN.assert(ACK[o], "Cannot find object: " .. o) end
-local function empty(o)
-    ZEN.assert(not ACK[o], "Cannot overwrite existing object: " .. o)
-end
 
-When("create the keypair", function()
+When("create the multidarkroom keypair", function()
     -- keygen: δ = r.O ; γ = δ.G2
-    empty 'keypair'
-    local sk = INT.random() -- signing key
-    ACK.keypair = {signing_key = sk, credential_key = INT.random()}
-    -- verifier_key = G2 * sk }
+    ZEN.empty 'multidarkroom keypair'
+    ACK.multidarkroom_keypair = {signing_key    = INT.random(), -- BLS secret signing key
+                   credential_key = INT.random()} -- Elgamal secret credential key
+end)
+-- create the multidarkroom keypair with secret key '' 
+
+When("create the multidarkroom verifier", function()
+    ZEN.empty 'multidarkroom verifier'
+    ZEN.have 'multidarkroom_keypair'
+    ACK.multidarkroom_verifier = G2 * ACK.multidarkroom_keypair.signing_key
 end)
 
-When("create the verifier", function()
-    empty 'verifier'
-    have 'keypair'
-    ACK.verifier = G2 * ACK.keypair.signing_key
+When("create the multidarkroom credential request", function() -- lambda
+    ZEN.have 'multidarkroom keypair'
+    ACK.multidarkroom_credential_request = ABC.prepare_blind_sign(ACK.multidarkroom_keypair.credential_key)
 end)
 
-When("create the issuance request", function() -- lambda
-    have 'keypair'
-    ACK.issuance_request = ABC.prepare_blind_sign(ACK.keypair.credential_key)
-end)
+-- When("create the issuer key",
+--      function() ACK.issuer_key = {x = INT.random(), y = INT.random()} end)
 
-When("create the issuer key",
-     function() ACK.issuer_key = {x = INT.random(), y = INT.random()} end)
+-- When("create the issuer verifier", function()
+--     empty 'credential'
+--     have 'issuer_key'
+--     ACK.credential = {
+--         alpha = G2 * ACK.issuer_key.x,
+--         beta = G2 * ACK.issuer_key.y
+--     }
+-- end)
 
-When("create the credential", function()
-    empty 'credential'
-    have 'issuer_key'
-    ACK.credential = {
-        alpha = G2 * ACK.issuer_key.x,
-        beta = G2 * ACK.issuer_key.y
-    }
-end)
+-- When("create the issuer signature", function() -- sigmatilde
+--     empty 'issuer_signature'
+--     ZEN.assert(not ACK.issuer_signature,
+--                "Cannot overwrite existing object:" .. " issuer signature")
+--     have 'issuance_request'
+--     have 'issuer_key'
+--     ACK.issuer_signature = ABC.blind_sign(ACK.issuer_key, ACK.issuance_request)
+-- end)
 
-When("create the issuer signature", function() -- sigmatilde
-    empty 'issuer_signature'
-    ZEN.assert(not ACK.issuer_signature,
-               "Cannot overwrite existing object:" .. " issuer signature")
-    have 'issuance_request'
-    have 'issuer_key'
-    ACK.issuer_signature = ABC.blind_sign(ACK.issuer_key, ACK.issuance_request)
-end)
+-- GOAL:
+-- ACK.credentials
 
-When("create the verified credential", function()
-    empty 'verified_credential'
-    have 'keypair'
-    ACK.verified_credential = ABC.aggregate_creds(ACK.keypair.credential_key,
-                                                  {ACK.issuer_signature})
-end)
-
-When("create the multisignature with UID ''", function(uid)
+When("create the multidarkroom session with UID ''", function(uid)
     empty 'multisignature'
     have 'verifier'
     have(uid)
@@ -182,7 +174,7 @@ When("create the multisignature with UID ''", function(uid)
     ACK.multisignature = {UID = UID, SM = UID * r, verifier = PM}
 end)
 
-When("create the signature", function()
+When("create the multidarkroom signature", function()
     empty 'signature'
     have 'keypair'
     have 'multisignature'
@@ -195,7 +187,7 @@ When("create the signature", function()
             pubcred = {pubcred.alpha + v.alpha, pubcred.beta + v.beta}
         end
     end
-    local p, z = ABC.prove_cred_uid(pubcred, ACK.verified_credential,
+    local p, z = ABC.prove_cred_uid(pubcred, ACK.credentials,
                                     ACK.keypair.credential_key,
                                     ACK.multisignature.UID)
     ACK.signature = {
@@ -209,7 +201,7 @@ end)
 When("prepare credentials for verification", function()
     have 'credential'
     local res = false
-    for k, v in pairs(ACK.credential) do
+    for k, v in pairs(ACK.verifier) do
         if not res then
             res = {alpha = v.alpha, beta = v.beta}
         else
@@ -217,10 +209,10 @@ When("prepare credentials for verification", function()
             res.beta = res.beta + v.beta
         end
     end
-    ACK.credential = res
+    ACK.verifiers = res
 end)
 
-When("verify the signature credential", function()
+When("verify the multidarkroom credential proof", function()
     have 'signature'
     have 'credential'
     have 'multisignature'
@@ -229,34 +221,31 @@ When("verify the signature credential", function()
                "Signature has an invalid credential to sign")
 end)
 
-When("check the signature fingerprint is new", function()
+When("check the multidarkroom signature fingerprint is new", function()
     have 'signature'
     have 'multisignature'
-    if ACK.multisignature.fingerprints then
-        for k, v in pairs(ACK.multisignature.fingerprints) do
-            ZEN.assert(v ~= ACK.signature.zeta,
-                       "Signature fingerprint is not new")
-        end
-    end
+    if not ACK.multisignature.fingerprints then return end
+    ZEN.assert(not ACK.multisignature.fingerprints[ACK.signature.zeta],
+               "Signature fingerprint is not new")
 end)
 
-When("add the fingerprint to the multisignature", function()
+When("add the multidarkroom fingerprint to the multisignature", function()
     have 'signature'
     have 'multisignature'
     if not ACK.multisignature.fingerprints then
-        ACK.multisignature.fingerprints = {ACK.signature.zeta}
+        ACK.multisignature.fingerprints[ACK.signature.zeta] = 1
     else
-        table.insert(ACK.multisignature.fingerprints, ACK.signature.zeta)
+        ACK.multisignature.fingerprints[ACK.signature.zeta] = 1
     end
 end)
 
-When("add the signature to the multisignature", function()
+When("add the multidarkroom signature to the multisignature", function()
     have 'multisignature'
     have 'signature'
     ACK.multisignature.SM = ACK.multisignature.SM + ACK.signature.signature
 end)
 
-When("verify the multisignature is valid", function()
+When("verify the multidarkroom signature is valid", function()
     have 'multisignature'
     ZEN.assert(
         ECP2.miller(ACK.multisignature.verifier, ACK.multisignature.UID) ==

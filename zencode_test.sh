@@ -4,25 +4,29 @@
 ####################
 # common script init
 . ./aux/utils.sh
-Z="`detect_zenroom_path` `detect_zenroom_conf`"
+#Z="`detect_zenroom_path` `detect_zenroom_conf`"
 ####################
+function zexe() {
+	script=$1
+	shift 1
+	cat > $script
+	zenroom -l zencode_multidarkroom.lua -z $script $*
+}
 
 ## ISSUER
-cat <<EOF | zexe issuer_keygen.zen -l zencode_multidarkroom.lua | tee issuer_key.json
-Scenario multidarkroom
+cat <<EOF | zexe issuer_keygen.zen -l zencode_multidarkroom.lua | tee issuer_keypair.json
+Scenario credential
 Given I am 'The Authority'
-when I create the issuer key
-Then print my 'issuer key'
+when I create the issuer keypair
+Then print my 'issuer keypair'
 EOF
 
-cat <<EOF | zexe issuer_credential.zen -l zencode_multidarkroom.lua -k issuer_key.json | tee credential.json
-Scenario multidarkroom
-Given I am 'The Authority'
-and I have my 'issuer key'
-when I create the credential
-Then print my 'credential'
+cat <<EOF | zexe issuer_verifier.zen -a issuer_keypair.json | tee issuer_verifier.json
+Scenario credential: publish verifier
+Given that I am known as 'The Authority'
+and I have my valid 'issuer keypair'
+Then print my 'verifier' from 'issuer keypair'
 EOF
-##
 
 generate_participant() {
     local name=$1
@@ -30,38 +34,40 @@ generate_participant() {
 	cat <<EOF | zexe keygen_${1}.zen -l zencode_multidarkroom.lua | tee keypair_${1}.json
 Scenario multidarkroom
 Given I am '${1}'
-When I create the keypair
-Then print my 'keypair'
+When I create the multidarkroom keypair
+Then print my 'multidarkroom keypair'
 EOF
 
 	cat <<EOF | zexe pubkey_${1}.zen -l zencode_multidarkroom.lua -k keypair_${1}.json | tee verifier_${1}.json
 Scenario multidarkroom
 Given I am '${1}'
-and I have my 'keypair'
-When I create the verifier
-Then print my 'verifier'
+and I have my 'multidarkroom keypair'
+When I create the multidarkroom verifier
+Then print my 'multidarkroom verifier'
 EOF
 
 	cat <<EOF | zexe request_${1}.zen -l zencode_multidarkroom.lua -k keypair_${1}.json | tee request_${1}.json
 Scenario multidarkroom
 Given I am '${1}'
-and I have my 'keypair'
-When I create the issuance request
-Then print my 'issuance request'
+and I have my 'multidarkroom keypair'
+When I create the multidarkroom credential request
+and I rename the 'multidarkroom credential request' to 'credential request'
+Then print my 'credential request'
 EOF
 	##
 
 	## ISSUER SIGNS
-	cat <<EOF | zexe issuer_sign_${1}.zen -l zencode_multidarkroom.lua -k issuer_key.json -a request_${1}.json | tee issuer_signature_${1}.json
-Scenario multidarkroom
+	cat <<EOF | zexe issuer_sign_${1}.zen -l zencode_multidarkroom.lua -k issuer_keypair.json -a request_${1}.json | tee issuer_signature_${1}.json
+Scenario credential
 Given I am 'The Authority'
-and I have my 'issuer key'
-and I have a 'issuance request' in '${1}'
-when I create the issuer signature
-Then print my 'issuer signature'
+and I have my 'issuer keypair'
+and I have a 'credential request' inside '${1}'
+when I create the credential signature
+Then print my 'credential signature'
 EOF
 	##
 
+exit 0
 	## PARTICIPANT AGGREGATES SIGNED CREDENTIAL
 	cat <<EOF | zexe aggr_cred_${1}.zen -l zencode_multidarkroom.lua -k keypair_${1}.json -a issuer_signature_${1}.json | tee verified_credential_${1}.json
 Scenario multidarkroom
@@ -93,7 +99,7 @@ Scenario multidarkroom
 Given I have a 'verifier' from 'Alice'
 and I have a 'verifier' from 'Bob'
 and I have a 'string' named 'today'
-When I create the multisignature with uid 'today'
+When I create the multidarkroom session with uid 'today'
 Then print the 'multisignature'
 EOF
 #
@@ -113,7 +119,7 @@ and I have my 'verified credential'
 and I have my 'keypair'
 and I have a 'multisignature'
 and I have a 'credential' from 'The Authority'
-When I create the signature
+When I create the multidarkroom signature
 Then print the 'signature'
 EOF
 }
