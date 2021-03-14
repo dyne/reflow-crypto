@@ -5,3 +5,5 @@
 *.aux
 *.lof
 *.out
+*.bbl
+*.blg

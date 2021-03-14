@@ -1,3 +1,25 @@
+% /*
+%  * This file is part of multidarkroom
+%  * 
+%  * Copyright (C) 2021 Dyne.org foundation
+%  * designed, written and maintained by Denis Roio <jaromil@dyne.org>
+%  * 
+%  * This program is free software: you can redistribute it and/or modify
+%  * it under the terms of the GNU Affero General Public License v3.0
+%  * 
+%  * This program is distributed in the hope that it will be useful,
+%  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+%  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%  * GNU Affero General Public License for more details.
+%  * 
+%  * Along with this program you should have received a copy of the
+%  * GNU Affero General Public License v3.0
+%  * If not, see http://www.gnu.org/licenses/agpl.txt
+%  * 
+%  * Last modified by Denis Roio
+%  * on Sunday, 14th March 2021 10:34:16 am
+%  */
+
 \documentclass[twocolumn]{article}
 \pdfoutput=1
 
@@ -88,7 +110,7 @@
 	Alberto Ibrisevic \\
 	Laboratory of Cryptography\\
 	Trento University (stage)\\
-	\texttt{bettowski@dyne.org} \\
+	\texttt{Bettowski@dyne.org} \\
     \And
     Andrea D'Intino \\
     Dyne.org foundation \\
@@ -602,8 +624,7 @@ Zencode is actual code executed inside the Zenroom VM, behind its
 implementation the algorithms follow closely the mathematical
 formulation explained in this article and can be reviewed in the free
 and open source code published at Zenroom.org: the Multidarkroom Zencode
-scenario implementation is contained inside the zencode_credential.lua
-and zencode_multidarkroom.lua source files found in the Zenroom source
+scenario implementation is contained inside the Zenroom source
 code.
 
 \subsection*{Credential Setup}
@@ -646,7 +667,7 @@ signs a credential to witness this condition.
   \caption{Keygen process sequence diagram}
   \label{fig:keygen}
   \centering
-  \includegraphics[width=0.5\textwidth]{keygen-seq}
+  \includegraphics[width=0.5\textwidth]{keygen-seq.png}
 \end{figure}
 
 The public key of the Issuer which is used to sign the credential
