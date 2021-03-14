@@ -15,4 +15,4 @@ mermaid:
 	$(call mermaid,verify.mmd,verify-seq.png)
 
 clean:
-	rm -f *blg *bbl *dvi *pdf *toc *out *aux *log *-seq.png
+	rm -f *blg *bbl *dvi *pdf *toc *out *aux *log *lof *-seq.png *.zen *.json
