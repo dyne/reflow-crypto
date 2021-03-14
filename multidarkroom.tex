@@ -123,7 +123,7 @@
 Multidarkroom is a novel signature scheme supporting unlinkable
 signatures by multiple parties authenticated by means of a
 zero-knowledge credential scheme. Multidarkroom integrates with
-blockchains to ensure condidentiality, authenticity and availability
+blockchains to ensure confidentiality, authenticity and availability
 even when credential issuing authorities are offline. We implement and
 evaluate a Multidarkroom smart contract for Zenroom and present an
 application related to multiple anonymous signatures by authenticated
@@ -145,7 +145,7 @@ parties to disclose secret signing keys to each other, nor requires the
 presence of a trusted third-party to receive them and compose the
 signatures. However, established schemes have shortcomings. Existing
 protocols do not provide the necessary efficiency, re-randomization or
-blind issuance properties necessary for the application to trustless
+blind issuance properties necessary for the application to trust-less
 distributed systems. Those managing to implement such privacy preserving
 features are prone to rogue-key attacks \citep{ietf-bls} since they
 cannot grant that signatures are produced by legitimate key holders.
@@ -168,7 +168,7 @@ aggregation. While being signed, duplicates may be avoided by collecting
 unlinkable fingerprints of signing parties, as they would invalidate the
 final result. Before being able to sign, a one-time setup phase is
 required where the signing party collects and aggregates a signed
-credential from one or more autorities. The attribute showing and
+credential from one or more authorities. The attribute showing and
 verification are $O(1)$ in terms of both cryptographic computations and
 communication of cryptographic material, irrespective of the number of
 authorities \citep{coconut-2018}.
@@ -216,7 +216,7 @@ credential issuer.
 
 \paragraph*{Need to Know.}
 Moving further in envisioning the possibilities opened by Multidarkroom
-is important to state the aggregability of signatures into compact
+is important to state the possibility to aggregate (sum) signatures into compact
 multi-signatures, a core feature of our BLS based signature scheme
 \citep{compact-multisig}. The base implementation exploiting this
 feature is that of a signature scheme for a \textbf{single document
@@ -249,7 +249,7 @@ requirement for the material passport, while the possibility to
 aggregate its signatures allows to group multiple signatures into a
 single compact one, without requiring any interaction with the previous
 signers. The product signature will then be the sum of all materials
-composing or consumed for it and it will be the athenticated and
+composing or consumed for it and it will be the authenticated and
 immutable track record of all materials composing the product.
 
 \begin{enumerate}
@@ -273,7 +273,7 @@ immutable track record of all materials composing the product.
   key generation, issuance, aggregation and verification of credentials operate
   (Section \ref{sec:credential}). The scheme is an application of the Coconut
   credential scheme \citep{coconut-2018} that is general purpose and can be
-  scaled to a fully distributed threshold issuance that is re-randomizable.
+  scaled to a fully distributed issuance that is re-randomizable.
 \item We implement a Zencode scenario of Multidarkroom to be executed on and
   off-chain by the Zenroom VM, complete with functions for public credential
   issuance, signature session creation and multi-party non-interactive signing
@@ -339,7 +339,7 @@ If verification passes it means that $\sigma$ is a valid signature for $m$ and t
 \]
 \end{proof}
 
-BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, meaning that (with the assumption made on $e$) signature and verification are obtained in very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$ in a suitable way. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained in the context of a multi-party computation using the same message $m$ but different partecipants.
+BLS signatures present some interesting features. For instance, the length of the output $\sigma$ competes to those obtained by ECDSA and similar algorithms; in our specific case, by using BLS-383 \citep{bls383}, it will be 32 Bytes long, which is typically a standard nowadays. Then, since this curve is also pairing-friendly, meaning that (with the assumption made on $e$) signature and verification are obtained in very short time. Moreover, BLS supports also aggregation, that is the ability to aggregate a collection of multiple signatures $\sigma_i$ (each one related to a different message $m_i$) into a singular new object $\sigma$, that can be validated using the respective public keys $pk_i$ in a suitable way. This is possible thanks to the fact that $\sigma_i\in G_1 \forall i$, giving to the algorithm an homomorphic property. We will show now how this last feature can be attained in the context of a multi-party computation using the same message $m$ but different participants.
 
 \subsection*{Session Generation}
 
@@ -351,7 +351,7 @@ After the key generation step we introduce a new phase called \textbf{session ge
     \item[4.] the first layer of the signature $\sigma \leftarrow r\cdot U$, later to be summed with all other signatures in a multi-party computation setup resulting in the final signature as $\sigma \leftarrow r\cdot U + \sum_i sk_i\cdot U$
     \item[5.] the array of unique fingerprints $\zeta_i$ of each signature resulting from the credential authentication (see section \ref{sec:credential}) 
 \end{itemize}
-After this phase is terminated, every partecipants involved in the session start their own signing phase during the session, producing (from the same message $m$) their respective $\sigma_i$'s. The final signature $\sigma$ is then computed in this way: first of all let us call $\sigma_0 = r\cdot U$, then supposing $k$ partecipants have already aggrgated their $\sigma_i$, obtaing a partial signature $S_k$, the $(k+1)$-th one will compute
+After this phase is terminated, every participants involved in the session start their own signing phase during the session, producing (from the same message $m$) their respective $\sigma_i$'s. The final signature $\sigma$ is then computed in this way: first of all let us call $\sigma_0 = r\cdot U$, then supposing $k$ participants have already aggrgated their $\sigma_i$, obtaining a partial signature $S_k$, the $(k+1)$-th one will compute
 \[
   S_{k+1}=S_k+\sigma_k = \sum_{i=0}^{k+1} \sigma_i
 \]
@@ -432,7 +432,7 @@ At this point the user will now have a blind credential $\tilde{\sigma} = (c, \t
 \tilde{a} &= y \cdot a \\
 \tilde{b} &= x\cdot c + y\cdot b
 \end{align*}
-The user then will have to unblind it using its secret credential key, obtaining $\sigma_{ck} = (c, s) = (c, \tilde{b} - ck_i (\tilde{a}))$, which will use to prove its identity when signing a message. The procedure is similar to the one seen before with some extra details:
+The user then will have to un-blind it using its secret credential key, obtaining $\sigma_{ck} = (c, s) = (c, \tilde{b} - ck_i (\tilde{a}))$, which will use to prove its identity when signing a message. The procedure is similar to the one seen before with some extra details:
 \begin{itemize}
     \item \textbf{Setup.} As for the the BLS signature, an elliptic point $U$, associated to the hash of the message to sign, is required as an Unique Identifier (\verb!UID!) for the signing session;
     \item \textbf{Credential proving.} The user produces two cryptographical objects $\theta$ (containing a new proof $\pi_v$) and $\zeta$ (which is unequivocally associated to $U$) through \verb!prove_cred_uid!, taking as input its own credential $\sigma$, the related secret attribute $c_k$, the authority public key $v_k = (\alpha, \beta)$ and the session point $U$.
@@ -547,7 +547,7 @@ decisional Diffie-Hellman Problem (DDH) \citep{DDH-problem}, the
 external Diffie-Hellman Problem (XDH), and with the
 Lysyanskaya-Rivest-Sahai-Wol Problem (LRSW) \citep{lrsw-assumption},
 which are connected to the Discrete Logarithm. In fact, under these
-assumptions, we have that our protocol satisfies uforgeability,
+assumptions, we have that our protocol satisfies unforgeability,
 blindness, and unlinkability.
 
 There are reserves about the maturity of pairing-based ellipcic curve
@@ -557,7 +557,7 @@ as a pioneering field of cryptography, in contrast to well tested
 standards as RSA. One uncertainty shared with RSA is that of the future
 growth of quantum-computing technologies that may be able to overcome
 the Discrete Logarithmic assumptions by qualitatively different
-compuational means.
+computational means.
 
 Multidarkroom then may be considered vulnerable to quantum-computing
 attacks, as well hard to patch, because the pairing-based design sits at
@@ -571,7 +571,7 @@ The Multidarkroom implementation we are presenting in this paper and
 that we have published as a Zenroom scenario ready to use is based on
 the BLS383 curve \citep{bls383} that in the current implementation
 provided by the AMCL library has shown to pass all lab-tests regarding
-pairing properties, a posiive result that is not shared with the
+pairing properties, a positive result that is not shared with the
 slightly different BLS381-12 curve adopted by ETH2.0. Debating the
 choice of BLS381 is well beyond the scope of this paper, but is worth
 mentioning that our lab-tests have proved also the BLS461 curve to work
@@ -631,7 +631,7 @@ of signers.
 
 \textbf{Keygen:} Generate a credential request and have it signed by
 an Issuer, as well generate a BLS keypair used to sign documents. This
-procedure will generate private keys that should not be comunicated,
+procedure will generate private keys that should not be communicated,
 as well public BLS keys that can be aggregated for signature
 verification.
 
