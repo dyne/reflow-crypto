@@ -37,7 +37,7 @@ G1 = ECP.generator()
 G2 = ECP2.generator()
 
 -- credentials
-ZK = require_once('crypto_abc')
+ZK = require_once('crypto_credential')
 issuer = ZK.issuer_keygen()
 
 -- keygen: δ = r.O ; γ = δ.G2

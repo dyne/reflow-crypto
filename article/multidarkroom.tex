@@ -26,7 +26,7 @@
 \usepackage{natbib}
 \usepackage{doi}
 \usepackage{inconsolata}
-\usepackage[x11names]{xcolor}
+\usepackage{xcolor}
 \usepackage{listings}
 \usepackage{booktabs} % For prettier tables
 
@@ -587,28 +587,37 @@ At last the complexity and flexibility of Multidarkroom in its different applica
 \section{Implementation}
 \label{sec:implementation}
 
-\lstset{basicstyle=\ttfamily\scriptsize, breaklines=true}
+% \lstset{basicstyle=\ttfamily\scriptsize, breaklines=true}
 
 In this section we illustrate our implementation of Multidarkroom
 keygen, sign and verify operations outlining for each:
 
 \begin{itemize}
-  \item the communication sequence diagram (figure)
+  \item the communication sequence diagram
  % \item the Zenroom code (Lua dialect script)
-  \item the Zencode statements
+  \item the Zencode statements composing the sequence 
 \end{itemize}
 
-In addition to the above, a Setup operation will be briefly
-illustrated without the sequence diagram, as it includes the local
-creation of a keypair for the Issuer who will validate the
-credentials.
+Zencode is actual code executed inside the Zenroom VM, behind its
+implementation the algorithms follow closely the mathematical
+formulation explained in this article and can be reviewed in the free
+and open source code published at Zenroom.org: the Multidarkroom Zencode
+scenario implementation is contained inside the zencode_credential.lua
+and zencode_multidarkroom.lua source files found in the Zenroom source
+code.
 
-\paragraph*{Setup:} Generate the Issuer keys for credential signature
+\subsection*{Credential Setup}
 
-\begin{lstlisting}[style=zencode]
+We begin with the Credential Setup sequence which has to be executed
+only once to enable participants to produce signatures. This sequence is
+briefly illustrated with a diagram and it consists in the creation of
+keypair for both the Issuer, who will sign the participant credentials,
+and the participant who will request an issuer credential.
+
+\begin{lstlisting}[style=zencode,caption={Issuer Keygen}]
 Given I am 'The Issuer'
-When I create the issuer keypair
-Then print my 'issuer keypair'  
+When I create the issuer key
+Then print my 'keys'  
 \end{lstlisting}
 
 Executed by the Zencode utterance:
