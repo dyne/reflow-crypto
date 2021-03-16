@@ -52,6 +52,9 @@
 \usepackage{listings}
 \usepackage{booktabs} % For prettier tables
 
+\usepackage{draftwatermark}
+\SetWatermarkText{Draft}
+
 \lstdefinestyle{lua}{
   language=[5.3]Lua,
   basicstyle=\ttfamily,
@@ -206,9 +209,10 @@ Multidarkroom provides a production-ready implementation that is easy to embed i
 The participation to a signature will be governed by one or more issuers holding keys for the one-time setup of signature credentials:
 
 \begin{enumerate} % [label=\large\protect\textcircled{\small\arabic*}]
-  \item Participant generates keys and a credential request
-  \item Issuer signs the credential request
-  \item Participant stores the credential in its keyring
+  \item Participant generates keys
+  \item Participant sends a credential request to Issuer
+  \item Issuer signs the credential request and sends back to Participant
+  \item Participant may create credential proofs to authenticate in public
 \end{enumerate}
 
 % \begin{itemize}
@@ -216,6 +220,15 @@ The participation to a signature will be governed by one or more issuers holding
 %   \item[\circled{2}] Issuer signs the credential request
 %   \item[\circled{3}] Participant stores the credential in its keyring
 % \end{itemize}
+
+
+\begin{figure}
+  \caption{Basic credential authentication }
+  \label{fig:credential_diagram}
+  \centering
+  \includegraphics[width=0.5\textwidth]{credential_diagram.eps}
+\end{figure}
+
 
 Following this setup any participant will be able to produce a zero-knowledge proof of possession of the credential. The proof of possession will be a requirement when participating to any signature process.
 
@@ -238,18 +251,18 @@ credential issuer.
 
 \paragraph*{Need to Know.}
 Moving further in envisioning the possibilities opened by Multidarkroom
-is important to state the possibility to aggregate (sum) signatures into compact
-multi-signatures, a core feature of our BLS based signature scheme
-\citep{compact-multisig}. The base implementation exploiting this
-feature is that of a signature scheme for a \textbf{single document
-split in separate sections to be signed by different participants}: all
-the signatures can be later aggregated in a single one proving the whole
+is important to state the possibility to aggregate (sum) signatures into
+compact multi-signatures, a core feature of our BLS based signature
+scheme \citep{compact-multisig}. The base implementation exploiting this
+feature is that of a signature scheme for a single document split in
+separate sections to be signed by different participants: all the
+signatures can be later aggregated in a single one proving the whole
 document has been signed by all participants, without being disclosed to
 all of them in its entirety. This application helps to enforce the
 principles of need-to-know and least privilege to the access of
-information \citep{info-protection} and is useful for the realization
-of privacy-aware applications in various sectors, for instance for
-medical and risk mitigation analysis.
+information \citep{info-protection} and is useful for the realization of
+privacy-aware applications in various sectors, for instance for medical
+and risk mitigation analysis.
 
 \paragraph*{Material Passport.}
 Drawing on feature of multiple signature aggregation, Multidarkroom can
@@ -281,6 +294,16 @@ immutable track record of all materials composing the product.
   \item One may publish the signed material passport created this way 
   \item Anyone may verify the integrity of the material passport
 \end{enumerate}
+
+\paragraph*{Disposable Identities}
+
+A Disposable Identity is based on four properties common to other
+authentication and identification systems: verifiability, privacy,
+transparency, trustworthiness; then in addition introduces a fifth
+property: disposability. Disposability permits purpose-specific and
+context-driven authentication, to avoid linking the same identity across
+different authentication contexts \citep{dispid}.
+
 
 
 \subsection*{This paper makes three key contributions}
@@ -525,14 +548,14 @@ We now show for the proof $\pi_s$ that actually by using the responses $r_h, r_k
                     &= (c_h r + w_r - c_h r)\cdot G_1 + (c_h h + w_h - c_h h)\cdot HS \\
                     &= w_r \cdot G_1 + w_h\cdot HS = C_w
 \end{align*} 
-Regarding the second proof $\pi_v$, we have to prove both the identities (\ref{challenge pi_v}) and (\ref{miller}) hold. We will focus only on the latter since the former requires a similar approach on what we have have done for $\pi_s$, but with different parameters involved ($\kappa, \nu$, etc.). The LHS of the relation can be expressed as
+Regarding the second proof $\pi_v$, we have to prove both the identities (\ref{challenge pi_v}) and (\ref{miller}) hold. We will focus only on the latter since the former requires a similar approach on what we have have done for $\pi_s$, but with different parameters involved ($\kappa, \nu$, etc.). The left-hand side of the relation can be expressed as
 \begin{align*}
     e(\kappa, c') &= e(\alpha + h\cdot\beta + r\cdot G_2, c') \\
     &= e(x\cdot G_2 + hy\cdot G_2  + r\cdot G_2,\tilde{r}\cdot G_1) \\
     &= e((x+hy+r)\cdot G_2, \tilde{r}\cdot G_1) \\
     &= e(G_2,G_1)^{(x+hy+r)\tilde{r}}
 \end{align*}
-using the substitution $c'=\tilde{r}\cdot G_1$, with $\tilde{r}\in\mathbb{F}_p$ since we know that $c'\in E$. For the RHS we have instead
+using the substitution $c'=\tilde{r}\cdot G_1$, with $\tilde{r}\in\mathbb{F}_p$ since we know that $c'\in E$. For the right-hand side we have instead
 \begin{align*}
     e(G_2, s' + \nu) &= e(G_2, r'\cdot s + r \cdot c') \\
     &= e(G_2, r'(\tilde{b} - ck_i y (\tilde{a})) + r \cdot c') \\
