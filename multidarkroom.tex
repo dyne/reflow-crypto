@@ -206,13 +206,13 @@ verification $40ms$ on average consumer hardware.
 
 Multidarkroom provides a production-ready implementation that is easy to embed in end-to-end encryption applications. By making it possible for multiple parties to anonymously authenticate and produce untraceable signatures, its goal is to leverage privacy-by-design scenarios that minimize the information exchange needed for document authentication.
 
-The participation to a signature will be governed by one or more issuers holding keys for the one-time setup of signature credentials:
+The participation to a signature will be governed by one or more issuers holding keys for the one-time setup of signature credentials. The steps outlined below are represented in figure \ref{fig:credential_diagram}:
 
 \begin{enumerate} % [label=\large\protect\textcircled{\small\arabic*}]
   \item Participant generates keys
   \item Participant sends a credential request to Issuer
-  \item Issuer signs the credential request and sends back to Participant
-  \item Participant may create credential proofs to authenticate in public
+  \item Issuer signs the credential request and sends it back
+  \item Participant can create anonymous credential proofs
 \end{enumerate}
 
 % \begin{itemize}
@@ -230,24 +230,53 @@ The participation to a signature will be governed by one or more issuers holding
 \end{figure}
 
 
-Following this setup any participant will be able to produce a zero-knowledge proof of possession of the credential. The proof of possession will be a requirement when participating to any signature process.
+Following this setup any participant will be able to produce a
+zero-knowledge proof of possession of the credential, which can be
+verified by anyone anonymously on the blockchain.
 
 The base application of Multidarkdroom is obviously the collective
-signature of digital documents, following such a flow:
+signature of digital documents and the signed credential proof will be a
+requirement to participate to any signature process.
+
+A Multidarkroom signature process is best described in 3 main steps:
+session creation, signature and verification.
+
+\paragraph*{1. Anyone creates a session}
+
+A session may be created by anyone, no credentials are required, but only information that should be public: the public keys of participants holding a credential to sign, the public verifier of the issuer who has signed the credentials and at last a document to be signed. The steps below are represented in figure \ref{fig:create_session} and illustrate how a signature session is created: 
 
 \begin{enumerate}
-  \item One may choose a document and decide to indict a signature session
-  \item One selects the participants and the issuer credential required to participate to the signature session
-  \item One then publishes the signature session without disclosing the identity of participants
-  \item Participants may be informed about the signature session and may chose to add their signature anonymously 
-  \item Anyone may be informed about the signature session linked to the document and be able to verify if signed by all and only all participants without knowing their identity
+  \item Participants will publish their public keys, available to anyone 
+  \item Anyone may indict a signature session by selecting a document, the public keys of signing participants and the issuer
+  \item The signature session is then published without disclosing the identity of any participant
 \end{enumerate}
 
-There are several configurable aspects in this flow that may or may not
-disclose bits information as who has indicted the signature session or
-what documents are linked to signatures, however the bottom-line is that
-the only identity that really needs to be public is that of the
-credential issuer. 
+\begin{figure}
+  \caption{Session Creation}
+  \label{fig:create_session}
+  \centering
+  \includegraphics[width=0.5\textwidth]{create_session.eps}
+\end{figure}
+
+\paragraph*{2. Participants sign the session}
+
+Only elected participants that were initially chosen to sign the session may sign it, this is forced through credential authentication. Whenever they know about the existance of a session requesting their signature, they may chose to sign it.
+
+\begin{enumerate}
+  \item Participants may be informed about the signature session and may chose to sign it anonymously 
+  \item Anyone may be informed about the signature session and be able to verify if the document is signed by all and only all participants
+\end{enumerate}
+
+\paragraph*{Anyone verifies signatures}
+
+Until the session will have collected all the signatures of participants, its verification will not be valid. It is also impossible to know if all participants have signed the session or how many are missing. Anyone can verify the state of the signature session in any moment just by having the document and the session.  
+
+There are configurable aspects in this flow that may or may not disclose
+more information, for instance who has indicted the signature session,
+what documents are linked to signatures and how many participants were
+called to sign: this depends from the implementation and the metadata it
+may add to signature sessions or the communication protocols adopted. 
+In any case the basic signature and verification flow of Multidarkroom requires that only one identity is really made public and is that of the issuer. 
 
 \paragraph*{Need to Know.}
 Moving further in envisioning the possibilities opened by Multidarkroom
