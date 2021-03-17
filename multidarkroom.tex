@@ -260,23 +260,56 @@ A session may be created by anyone, no credentials are required, but only inform
 
 \paragraph*{2. Participants sign the session}
 
-Only elected participants that were initially chosen to sign the session may sign it, this is forced through credential authentication. Whenever they know about the existance of a session requesting their signature, they may chose to sign it.
+Only elected participants that were initially chosen to sign the
+session may sign it, this is forced through credential
+authentication. Whenever they know about the existance of a session
+requesting their signature, they may chose to sign it. The steps below
+are illustrated in figure \ref{fig:verify_sign}.
 
 \begin{enumerate}
-  \item Participants may be informed about the signature session and may chose to sign it anonymously 
+  \item Participants may be informed about the signature session and
+    may create an anonymous signature to be added to the session 
+  \item Anyone may check that the anonymous signature is authentic
+    and not a duplicate, then adds it to the session
   \item Anyone may be informed about the signature session and be able to verify if the document is signed by all and only all participants
 \end{enumerate}
 
+\begin{figure}
+  \caption{Sign and Verify}
+  \label{fig:verify_sign}
+  \centering
+  \includegraphics[width=0.5\textwidth]{verify_sign.eps}
+\end{figure}
+
+A delicate aspect of BLS signatures is avoiding double-signing: if a
+participant signs twice then the whole signature will never be valid.
+Relying on a stateless credential authentication alone does not avoid
+this case in Multidarkroom, therefore we use a list of anonymous
+"fingerprints" of the signature related to the document being signed.
+Each signature will produce a participant fingerprint saved in a list
+that is checked against duplication before adding a new
+signature. This procedure adds significant computational overhead for
+sessions with a large number of participants, but it can be switched
+off in a system that avoids double-signing in its own architecture.
+
 \paragraph*{Anyone verifies signatures}
 
-Until the session will have collected all the signatures of participants, its verification will not be valid. It is also impossible to know if all participants have signed the session or how many are missing. Anyone can verify the state of the signature session in any moment just by having the document and the session.  
+Until the session will have collected all the signatures of
+participants, its verification will not be valid. It is also
+impossible to know if all participants have signed the session or how
+many are missing. Anyone can verify the state of the signature session
+in any moment just by having the document and the session, as
+illustrated in figure \ref{fig:verify_sign} along with the signature
+process.
 
-There are configurable aspects in this flow that may or may not disclose
-more information, for instance who has indicted the signature session,
-what documents are linked to signatures and how many participants were
-called to sign: this depends from the implementation and the metadata it
-may add to signature sessions or the communication protocols adopted. 
-In any case the basic signature and verification flow of Multidarkroom requires that only one identity is really made public and is that of the issuer. 
+Configurable features may be introduced in the Multidarkroom signature
+flow that may or may not disclose more information, for instance who
+has indicted the signature session, what documents are linked to
+signatures and how many participants were called to sign: this depends
+from the implementation and the metadata it may add to signature
+sessions or the communication protocols adopted.  In any case the
+basic signature and verification flow of Multidarkroom requires that
+only one identity is really made public and is that of the issuer.
 
 \paragraph*{Need to Know.}
 Moving further in envisioning the possibilities opened by Multidarkroom

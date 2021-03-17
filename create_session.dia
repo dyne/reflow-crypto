@@ -2,10 +2,10 @@
 <dia:diagram xmlns:dia="http://www.lysator.liu.se/~alla/dia/">
   <dia:diagramdata>
     <dia:attribute name="background">
-      <dia:color val="#ffffff"/>
+      <dia:color val="#ffffffff"/>
     </dia:attribute>
     <dia:attribute name="pagebreak">
-      <dia:color val="#000099"/>
+      <dia:color val="#000099ff"/>
     </dia:attribute>
     <dia:attribute name="paper">
       <dia:composite type="paper">
@@ -37,6 +37,9 @@
     </dia:attribute>
     <dia:attribute name="grid">
       <dia:composite type="grid">
+        <dia:attribute name="dynamic">
+          <dia:boolean val="true"/>
+        </dia:attribute>
         <dia:attribute name="width_x">
           <dia:real val="1"/>
         </dia:attribute>
@@ -53,7 +56,7 @@
       </dia:composite>
     </dia:attribute>
     <dia:attribute name="color">
-      <dia:color val="#d8e5e5"/>
+      <dia:color val="#d8e5e5ff"/>
     </dia:attribute>
     <dia:attribute name="guides">
       <dia:composite type="guides">
@@ -61,8 +64,27 @@
         <dia:attribute name="vguides"/>
       </dia:composite>
     </dia:attribute>
+    <dia:attribute name="display">
+      <dia:composite type="display">
+        <dia:attribute name="antialiased">
+          <dia:boolean val="true"/>
+        </dia:attribute>
+        <dia:attribute name="snap-to-grid">
+          <dia:boolean val="false"/>
+        </dia:attribute>
+        <dia:attribute name="snap-to-object">
+          <dia:boolean val="true"/>
+        </dia:attribute>
+        <dia:attribute name="show-grid">
+          <dia:boolean val="true"/>
+        </dia:attribute>
+        <dia:attribute name="show-connection-points">
+          <dia:boolean val="false"/>
+        </dia:attribute>
+      </dia:composite>
+    </dia:attribute>
   </dia:diagramdata>
-  <dia:layer name="Background" visible="true" active="true">
+  <dia:layer name="Background" visible="true" connectable="true" active="true">
     <dia:object type="Standard - Arc" version="0" id="O0">
       <dia:attribute name="obj_pos">
         <dia:point val="16.5,7.8"/>
@@ -145,12 +167,16 @@
       </dia:attribute>
     </dia:object>
     <dia:group>
+      <dia:attribute name="meta">
+        <dia:composite type="dict"/>
+      </dia:attribute>
+      <dia:attribute name="matrix"/>
       <dia:object type="Geometric - Perfect Circle" version="1" id="O3">
         <dia:attribute name="obj_pos">
           <dia:point val="7.95,6.35"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="7.9,6.3;10.9,9.3"/>
+          <dia:rectangle val="7.85,6.25;10.95,9.35"/>
         </dia:attribute>
         <dia:attribute name="meta">
           <dia:composite type="dict"/>
@@ -168,10 +194,10 @@
           <dia:real val="0.10000000149011612"/>
         </dia:attribute>
         <dia:attribute name="line_colour">
-          <dia:color val="#000000"/>
+          <dia:color val="#000000ff"/>
         </dia:attribute>
         <dia:attribute name="fill_colour">
-          <dia:color val="#ffffff"/>
+          <dia:color val="#ffffffff"/>
         </dia:attribute>
         <dia:attribute name="show_background">
           <dia:boolean val="true"/>
@@ -195,7 +221,7 @@
           <dia:point val="8.7,8.3"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="8.7,6.9175;10.34,8.635"/>
+          <dia:rectangle val="8.7,6.915;10.3375,8.6375"/>
         </dia:attribute>
         <dia:attribute name="text">
           <dia:composite type="text">
@@ -212,7 +238,7 @@
               <dia:point val="8.7,8.3"/>
             </dia:attribute>
             <dia:attribute name="color">
-              <dia:color val="#000000"/>
+              <dia:color val="#000000ff"/>
             </dia:attribute>
             <dia:attribute name="alignment">
               <dia:enum val="0"/>
@@ -225,12 +251,16 @@
       </dia:object>
     </dia:group>
     <dia:group>
+      <dia:attribute name="meta">
+        <dia:composite type="dict"/>
+      </dia:attribute>
+      <dia:attribute name="matrix"/>
       <dia:object type="Geometric - Perfect Circle" version="1" id="O5">
         <dia:attribute name="obj_pos">
           <dia:point val="7.97,9.96"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="7.92,9.91;10.92,12.91"/>
+          <dia:rectangle val="7.87,9.86;10.97,12.96"/>
         </dia:attribute>
         <dia:attribute name="meta">
           <dia:composite type="dict"/>
@@ -248,10 +278,10 @@
           <dia:real val="0.10000000149011612"/>
         </dia:attribute>
         <dia:attribute name="line_colour">
-          <dia:color val="#000000"/>
+          <dia:color val="#000000ff"/>
         </dia:attribute>
         <dia:attribute name="fill_colour">
-          <dia:color val="#ffffff"/>
+          <dia:color val="#ffffffff"/>
         </dia:attribute>
         <dia:attribute name="show_background">
           <dia:boolean val="true"/>
@@ -275,7 +305,7 @@
           <dia:point val="8.72,11.91"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="8.72,10.5275;10.36,12.245"/>
+          <dia:rectangle val="8.72,10.525;10.3575,12.2475"/>
         </dia:attribute>
         <dia:attribute name="text">
           <dia:composite type="text">
@@ -292,7 +322,7 @@
               <dia:point val="8.72,11.91"/>
             </dia:attribute>
             <dia:attribute name="color">
-              <dia:color val="#000000"/>
+              <dia:color val="#000000ff"/>
             </dia:attribute>
             <dia:attribute name="alignment">
               <dia:enum val="0"/>
@@ -305,12 +335,16 @@
       </dia:object>
     </dia:group>
     <dia:group>
+      <dia:attribute name="meta">
+        <dia:composite type="dict"/>
+      </dia:attribute>
+      <dia:attribute name="matrix"/>
       <dia:object type="Geometric - Perfect Circle" version="1" id="O7">
         <dia:attribute name="obj_pos">
           <dia:point val="7.89,13.57"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="7.84,13.52;10.84,16.52"/>
+          <dia:rectangle val="7.79,13.47;10.89,16.57"/>
         </dia:attribute>
         <dia:attribute name="meta">
           <dia:composite type="dict"/>
@@ -328,10 +362,10 @@
           <dia:real val="0.10000000149011612"/>
         </dia:attribute>
         <dia:attribute name="line_colour">
-          <dia:color val="#000000"/>
+          <dia:color val="#000000ff"/>
         </dia:attribute>
         <dia:attribute name="fill_colour">
-          <dia:color val="#ffffff"/>
+          <dia:color val="#ffffffff"/>
         </dia:attribute>
         <dia:attribute name="show_background">
           <dia:boolean val="true"/>
@@ -355,7 +389,7 @@
           <dia:point val="8.64,15.52"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="8.64,14.1375;10.28,15.855"/>
+          <dia:rectangle val="8.64,14.135;10.2775,15.8575"/>
         </dia:attribute>
         <dia:attribute name="text">
           <dia:composite type="text">
@@ -372,7 +406,7 @@
               <dia:point val="8.64,15.52"/>
             </dia:attribute>
             <dia:attribute name="color">
-              <dia:color val="#000000"/>
+              <dia:color val="#000000ff"/>
             </dia:attribute>
             <dia:attribute name="alignment">
               <dia:enum val="0"/>
@@ -385,12 +419,16 @@
       </dia:object>
     </dia:group>
     <dia:group>
+      <dia:attribute name="meta">
+        <dia:composite type="dict"/>
+      </dia:attribute>
+      <dia:attribute name="matrix"/>
       <dia:object type="Geometric - Perfect Circle" version="1" id="O9">
         <dia:attribute name="obj_pos">
           <dia:point val="7.86,17.13"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="7.81,17.08;10.81,20.08"/>
+          <dia:rectangle val="7.76,17.03;10.86,20.13"/>
         </dia:attribute>
         <dia:attribute name="meta">
           <dia:composite type="dict"/>
@@ -408,10 +446,10 @@
           <dia:real val="0.10000000149011612"/>
         </dia:attribute>
         <dia:attribute name="line_colour">
-          <dia:color val="#000000"/>
+          <dia:color val="#000000ff"/>
         </dia:attribute>
         <dia:attribute name="fill_colour">
-          <dia:color val="#ffffff"/>
+          <dia:color val="#ffffffff"/>
         </dia:attribute>
         <dia:attribute name="show_background">
           <dia:boolean val="true"/>
@@ -435,7 +473,7 @@
           <dia:point val="8.61,19.08"/>
         </dia:attribute>
         <dia:attribute name="obj_bb">
-          <dia:rectangle val="8.61,17.6975;10.25,19.415"/>
+          <dia:rectangle val="8.61,17.695;10.2475,19.4175"/>
         </dia:attribute>
         <dia:attribute name="text">
           <dia:composite type="text">
@@ -452,7 +490,7 @@
               <dia:point val="8.61,19.08"/>
             </dia:attribute>
             <dia:attribute name="color">
-              <dia:color val="#000000"/>
+              <dia:color val="#000000ff"/>
             </dia:attribute>
             <dia:attribute name="alignment">
               <dia:enum val="0"/>
@@ -495,7 +533,7 @@
         <dia:point val="5.95,18.6895"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="5.95,18.6895;42.85,28.2"/>
+        <dia:rectangle val="5.85,18.5895;42.95,28.3"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -513,10 +551,10 @@
         <dia:real val="0.10000000149011612"/>
       </dia:attribute>
       <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
+        <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
+        <dia:color val="#ffffffff"/>
       </dia:attribute>
       <dia:attribute name="show_background">
         <dia:boolean val="true"/>
@@ -540,15 +578,18 @@
             <dia:real val="1.9402777890857354"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="25.3892,24.0975"/>
+            <dia:point val="25.7321,24.1841"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="1"/>
           </dia:attribute>
         </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="text_fitting">
+        <dia:enum val="1"/>
       </dia:attribute>
       <dia:attribute name="flip_horizontal">
         <dia:boolean val="false"/>
@@ -565,7 +606,7 @@
         <dia:point val="13.95,13.825"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.95,13.185;13.95,13.9575"/>
+        <dia:rectangle val="13.95,13.23;13.95,13.9775"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -582,7 +623,7 @@
             <dia:point val="13.95,13.825"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -601,7 +642,7 @@
         <dia:point val="13.95,13.825"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.95,13.185;13.95,13.9575"/>
+        <dia:rectangle val="13.95,13.23;13.95,13.9775"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -618,7 +659,7 @@
             <dia:point val="13.95,13.825"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -654,7 +695,7 @@
             <dia:point val="13.05,8.25"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -687,7 +728,7 @@
             <dia:point val="13.02,11.86"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -720,7 +761,7 @@
             <dia:point val="12.99,15.27"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -753,7 +794,7 @@
             <dia:point val="12.96,18.98"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -769,7 +810,7 @@
         <dia:point val="28.7,12.7125"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="28.65,12.6625;34.1125,18.125"/>
+        <dia:rectangle val="28.6,12.6125;34.1625,18.175"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -787,10 +828,10 @@
         <dia:real val="0.10000000149011612"/>
       </dia:attribute>
       <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
+        <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
+        <dia:color val="#ffffffff"/>
       </dia:attribute>
       <dia:attribute name="show_background">
         <dia:boolean val="true"/>
@@ -831,7 +872,7 @@
             <dia:point val="29.4,16.1"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -857,6 +898,9 @@
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="3.8999999999999986"/>
+      </dia:attribute>
+      <dia:attribute name="line_style">
+        <dia:enum val="3"/>
       </dia:attribute>
     </dia:object>
     <dia:object type="Standard - Ellipse" version="0" id="O22">
@@ -898,7 +942,7 @@
             <dia:point val="30.45,6.55"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -940,7 +984,7 @@
         <dia:point val="29.875,9.025"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="29.875,7.8925;33.895,9.3"/>
+        <dia:rectangle val="29.875,7.8925;33.75,9.3"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -957,7 +1001,7 @@
             <dia:point val="29.875,9.025"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -973,7 +1017,7 @@
         <dia:point val="32,9.9"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.4509,9.84527;32.1709,12.5112"/>
+        <dia:rectangle val="31.462,9.84527;32.182,12.4547"/>
       </dia:attribute>
       <dia:attribute name="conn_endpoints">
         <dia:point val="32,9.9"/>
@@ -997,7 +1041,7 @@
         <dia:point val="37.1,10.45"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="37.05,10.4;40.7325,12.9875"/>
+        <dia:rectangle val="37.1,10.45;40.6825,12.9375"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -1010,15 +1054,6 @@
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.4875000092519652"/>
-      </dia:attribute>
-      <dia:attribute name="line_width">
-        <dia:real val="0.10000000149011612"/>
-      </dia:attribute>
-      <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
-      </dia:attribute>
-      <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1035,12 +1070,21 @@
             <dia:point val="37.45,12.2325"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
           </dia:attribute>
         </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="line_width">
+        <dia:real val="0.10000000149011612"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000ff"/>
+      </dia:attribute>
+      <dia:attribute name="fill_colour">
+        <dia:color val="#ffffffff"/>
       </dia:attribute>
     </dia:object>
     <dia:object type="Standard - Arc" version="0" id="O28">
@@ -1089,7 +1133,7 @@
             <dia:point val="27.65,19.95"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -1105,7 +1149,7 @@
         <dia:point val="30.62,13.06"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="30.57,13.01;32.27,14.71"/>
+        <dia:rectangle val="30.52,12.96;32.32,14.76"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -1123,10 +1167,10 @@
         <dia:real val="0.10000000000000001"/>
       </dia:attribute>
       <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
+        <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
+        <dia:color val="#ffffffff"/>
       </dia:attribute>
       <dia:attribute name="show_background">
         <dia:boolean val="true"/>
@@ -1150,7 +1194,7 @@
         <dia:point val="31.17,14.16"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.17,13.2527;31.6923,14.4271"/>
+        <dia:rectangle val="31.17,13.2775;31.665,14.375"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1167,7 +1211,7 @@
             <dia:point val="31.17,14.16"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -1183,7 +1227,7 @@
         <dia:point val="35.89,20.37"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="35.84,20.32;37.54,22.02"/>
+        <dia:rectangle val="35.79,20.27;37.59,22.07"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -1201,10 +1245,10 @@
         <dia:real val="0.10000000000000001"/>
       </dia:attribute>
       <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
+        <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
+        <dia:color val="#ffffffff"/>
       </dia:attribute>
       <dia:attribute name="show_background">
         <dia:boolean val="true"/>
@@ -1228,7 +1272,7 @@
         <dia:point val="36.44,21.47"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="36.44,20.5627;36.9623,21.7371"/>
+        <dia:rectangle val="36.44,20.5875;36.935,21.685"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1245,7 +1289,7 @@
             <dia:point val="36.44,21.47"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
@@ -1261,7 +1305,7 @@
         <dia:point val="15.15,5.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="15.1,5.05;16.8,6.75"/>
+        <dia:rectangle val="15.05,5;16.85,6.8"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -1279,10 +1323,10 @@
         <dia:real val="0.10000000000000001"/>
       </dia:attribute>
       <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
+        <dia:color val="#000000ff"/>
       </dia:attribute>
       <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
+        <dia:color val="#ffffffff"/>
       </dia:attribute>
       <dia:attribute name="show_background">
         <dia:boolean val="true"/>
@@ -1306,7 +1350,7 @@
         <dia:point val="15.7,6.25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="15.7,5.37;16.195,6.4625"/>
+        <dia:rectangle val="15.7,5.3675;16.195,6.465"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1323,7 +1367,7 @@
             <dia:point val="15.7,6.25"/>
           </dia:attribute>
           <dia:attribute name="color">
-            <dia:color val="#000000"/>
+            <dia:color val="#000000ff"/>
           </dia:attribute>
           <dia:attribute name="alignment">
             <dia:enum val="0"/>
