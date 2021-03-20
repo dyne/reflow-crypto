@@ -202,7 +202,7 @@ Our evaluation of the Multiparty primitives shows very promising
 results. Session creation takes about $20ms$, while signing $73ms$ and
 verification $40ms$ on average consumer hardware.
 
-\subsection*{Applications}
+\subsection*{Overview}
 
 Multidarkroom provides a production-ready implementation that is easy to embed in end-to-end encryption applications. By making it possible for multiple parties to anonymously authenticate and produce untraceable signatures, its goal is to leverage privacy-by-design scenarios that minimize the information exchange needed for document authentication.
 
@@ -258,6 +258,8 @@ A session may be created by anyone, no credentials are required, but only inform
   \includegraphics[width=0.5\textwidth]{create_session.eps}
 \end{figure}
 
+A Multidarkroom signature session can then be published for verification and its existance may be confidentially communicated to the participants elected to sign it. The possession of the session will allow to disclose the identity of the participants, but only that of the Issuer and the document (or the hash of it) signed.
+
 \paragraph*{2. Participants sign the session}
 
 Only elected participants that were initially chosen to sign the
@@ -311,20 +313,24 @@ sessions or the communication protocols adopted.  In any case the
 basic signature and verification flow of Multidarkroom requires that
 only one identity is really made public and is that of the issuer.
 
-\paragraph*{Need to Know.}
+\subsection*{Applications}
+
 Moving further in envisioning the possibilities opened by Multidarkroom
 is important to state the possibility to aggregate (sum) signatures into
 compact multi-signatures, a core feature of our BLS based signature
-scheme \citep{compact-multisig}. The base implementation exploiting this
-feature is that of a signature scheme for a single document split in
-separate sections to be signed by different participants: all the
-signatures can be later aggregated in a single one proving the whole
-document has been signed by all participants, without being disclosed to
-all of them in its entirety. This application helps to enforce the
-principles of need-to-know and least privilege to the access of
-information \citep{info-protection} and is useful for the realization of
-privacy-aware applications in various sectors, for instance for medical
-and risk mitigation analysis.
+scheme \citep{compact-multisig}.
+
+\paragraph*{Need to Know.}
+
+The base implementation exploiting this feature is that of a signature
+scheme for a single document split in separate sections to be signed by
+different participants: all the signatures can be later aggregated in a
+single one proving the whole document has been signed by all
+participants, without being disclosed to all of them in its entirety.
+This application helps to enforce the principles of need-to-know and
+least privilege to the access of information \citep{info-protection} and
+is useful for the realization of privacy-aware applications in various
+sectors, for instance for medical and risk mitigation analysis.
 
 \paragraph*{Material Passport.}
 Drawing on feature of multiple signature aggregation, Multidarkroom can
@@ -366,7 +372,9 @@ property: disposability. Disposability permits purpose-specific and
 context-driven authentication, to avoid linking the same identity across
 different authentication contexts \citep{dispid}.
 
+Multidarkroom can be adopted by such an application to remove the need of context-free identifiers and implement authentication functions through a disposable identity whose traceability is bound to a context UID. Furthermore, being a signature scheme, Multidarkroom can add the feature of context-free verifiable signatures (and multi-signatures) that are untraceable in public, but can be traced and even revoked in a known context by the means of context-specific signature fingerprints.
 
+This scenario is relevant for the implementation of privacy-preserving public sector applications that allow authentication and signatures through disposable identity systems.   
 
 \subsection*{This paper makes three key contributions}
 
