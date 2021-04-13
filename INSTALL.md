@@ -2,7 +2,7 @@
 # Latex setup description
 
 The project hosts an aesthetic and simple LaTeX style suitable for "preprint" publications such as arXiv and bio-arXiv, etc. 
-It is based on the [**nips_2018.sty**](https://media.nips.cc/Conferences/NIPS2018/Styles/nips_2018.sty) style, with many changes to support dual column, Lua and Zencode syntaxt highlight, stylish tables and some more features visible in the Multidarkroom paper.
+It is based on the [**nips_2018.sty**](https://media.nips.cc/Conferences/NIPS2018/Styles/nips_2018.sty) style, with many changes to support dual column, Lua and Zencode syntaxt highlight, stylish tables and some more features visible in the reflow paper.
 
 ## Dependencies
 
@@ -30,9 +30,9 @@ See **template.tex**
 
 ## Project files:
 1. **arxiv.sty** - the style file.
-2. **multidarkroom.tex** - article that uses the **arxiv style**.
-3. **references.bib** - the bibliography source file for multidarkroom.tex.
-4. **multidarkroom.pdf** - the output of the multidarkroom article in arxiv style.
+2. **reflow.tex** - article that uses the **arxiv style**.
+3. **references.bib** - the bibliography source file for reflow.tex.
+4. **reflow.pdf** - the output of the reflow article in arxiv style.
 
 
 ## Handling References when submitting to arXiv.org

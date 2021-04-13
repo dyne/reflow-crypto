@@ -18,7 +18,7 @@ References:
 
 2. Run `sudo make install` to download latest zenroom and install dependencies
 
-3. Run `make check` to run multidarkroom tests
+3. Run `make check` to run reflow tests
 
 
 ## Keygen and credential signature

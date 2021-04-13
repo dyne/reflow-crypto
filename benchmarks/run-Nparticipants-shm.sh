@@ -67,14 +67,14 @@ issuer_keygen_sign() {
 ## ISSUER SIGNS
 
 cat <<EOF | zexe /dev/shm/files/issuer_keygen.zen  | jq . | tee /dev/shm/files/issuer_key.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 when I create the issuer key
 Then print my 'issuer key'
 EOF
 
 cat <<EOF | zexe /dev/shm/files/issuer_credential.zen -k /dev/shm/files/issuer_key.json  | jq . | tee /dev/shm/files/credential.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 and I have my 'issuer key'
 when I create the credential
@@ -83,7 +83,7 @@ EOF
 ##
 
 	cat <<EOF | zexe /dev/shm/files/issuer_sign_${1}.zen -k /dev/shm/files/issuer_key.json -a /dev/shm/files/request_${1}.json  | jq . | tee /dev/shm/files/issuer_signature_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 and I have my 'issuer key'
 and I have a 'issuance request' in '${1}'
@@ -106,14 +106,14 @@ done
 
 ## ISSUER
 cat <<EOF | zexe /dev/shm/files/issuer_keygen.zen  | jq . | tee /dev/shm/files/issuer_key.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 when I create the issuer key
 Then print my 'issuer key'
 EOF
 
 cat <<EOF | zexe /dev/shm/files/issuer_credential.zen -k /dev/shm/files/issuer_key.json  | jq . | tee /dev/shm/files/credential.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 and I have my 'issuer key'
 when I create the credential
@@ -128,14 +128,14 @@ generate_participant() {
     local name=$1
     ## PARTICIPANT
 	cat <<EOF | zexe /dev/shm/files/keygen_${1}.zen  | jq . | tee /dev/shm/files/keypair_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 When I create the keypair
 Then print my 'keypair'
 EOF
 
 	cat <<EOF | zexe /dev/shm/files/pubkey_${1}.zen -k /dev/shm/files/keypair_${1}.json  | jq . | tee /dev/shm/files/verifier_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 and I have my 'keypair'
 When I create the verifier
@@ -143,7 +143,7 @@ Then print my 'verifier'
 EOF
 
 	cat <<EOF | zexe /dev/shm/files/request_${1}.zen -k /dev/shm/files/keypair_${1}.json  | jq . | tee /dev/shm/files/request_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 and I have my 'keypair'
 When I create the issuance request
@@ -153,7 +153,7 @@ EOF
 
 	## ISSUER SIGNS
 	cat <<EOF | zexe /dev/shm/files/issuer_sign_${1}.zen -k /dev/shm/files/issuer_key.json -a /dev/shm/files/request_${1}.json  | jq . | tee /dev/shm/files/issuer_signature_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 and I have my 'issuer key'
 and I have a 'issuance request' in '${1}'
@@ -164,7 +164,7 @@ EOF
 
 	## PARTICIPANT AGGREGATES SIGNED CREDENTIAL
 	cat <<EOF | zexe /dev/shm/files/aggr_cred_${1}.zen -k /dev/shm/files/keypair_${1}.json -a /dev/shm/files/issuer_signature_${1}.json  | jq . | tee /dev/shm/files/verified_credential_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 and I have my 'keypair'
 and I have a 'issuer signature' in 'The Authority'
@@ -211,7 +211,7 @@ echo "{\"today\": \"`date +'%s'`\"}" > /dev/shm/files/uid.json
 ### SCRIPT THAT PRODUCES THE MULTISIGNATURE
 #############################
 
-multisignature="Scenario multidarkroom \n"
+multisignature="Scenario reflow \n"
 
 for user in ${users[@]}
 do
@@ -245,7 +245,7 @@ cp multisignature.json multisignature_input.json
 function participant_sign() {
 	local name=$1
 	cat <<EOF | zexe /dev/shm/files/sign_session.zen -a /dev/shm/files/credential_to_sign.json -k /dev/shm/files/verified_credential_$name.json  | jq . | tee /dev/shm/files/signature_$name.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '$name'
 and I have my 'verified credential'
 and I have my 'keypair'
@@ -277,7 +277,7 @@ function collect_sign() {
 	cp -v /dev/shm/files/multisignature.json $tmp_msig
 	json_join /dev/shm/files/credential.json /dev/shm/files/signature_$name.json > $tmp_sig
 	cat << EOF | zexe /dev/shm/files/collect_sign.zen -a $tmp_msig -k $tmp_sig  | jq . | tee /dev/shm/files/multisignature.json
-Scenario multidarkroom
+Scenario reflow
 Given I have a 'multisignature'
 and I have a 'credential' from 'The Authority'
 and I have a 'signature'
@@ -303,7 +303,7 @@ done
 
 # VERIFY SIGNATURE
 cat << EOF | zexe /dev/shm/files/verify_sign.zen -a /dev/shm/files/multisignature.json | jq .
-Scenario multidarkroom
+Scenario reflow
 Given I have a 'multisignature'
 When I verify the multisignature is valid
 Then print 'SUCCESS'

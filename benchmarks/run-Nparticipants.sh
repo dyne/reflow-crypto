@@ -58,14 +58,14 @@ done
 
 ## ISSUER
 cat <<EOF | zexe ./files/issuer_keygen.zen  | jq . | tee ./files/issuer_key.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 when I create the issuer key
 Then print my 'issuer key'
 EOF
 
 cat <<EOF | zexe ./files/issuer_credential.zen -k ./files/issuer_key.json  | jq . | tee ./files/credential.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 and I have my 'issuer key'
 when I create the credential
@@ -77,14 +77,14 @@ generate_participant() {
     local name=$1
     ## PARTICIPANT
 	cat <<EOF | zexe ./files/keygen_${1}.zen  | jq . | tee ./files/keypair_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 When I create the keypair
 Then print my 'keypair'
 EOF
 
 	cat <<EOF | zexe ./files/pubkey_${1}.zen -k ./files/keypair_${1}.json  | jq . | tee ./files/verifier_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 and I have my 'keypair'
 When I create the verifier
@@ -92,7 +92,7 @@ Then print my 'verifier'
 EOF
 
 	cat <<EOF | zexe ./files/request_${1}.zen -k ./files/keypair_${1}.json  | jq . | tee ./files/request_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 and I have my 'keypair'
 When I create the issuance request
@@ -102,7 +102,7 @@ EOF
 
 	## ISSUER SIGNS
 	cat <<EOF | zexe ./files/issuer_sign_${1}.zen -k ./files/issuer_key.json -a ./files/request_${1}.json  | jq . | tee ./files/issuer_signature_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am 'The Authority'
 and I have my 'issuer key'
 and I have a 'issuance request' in '${1}'
@@ -113,7 +113,7 @@ EOF
 
 	## PARTICIPANT AGGREGATES SIGNED CREDENTIAL
 	cat <<EOF | zexe ./files/aggr_cred_${1}.zen -k ./files/keypair_${1}.json -a ./files/issuer_signature_${1}.json  | jq . | tee ./files/verified_credential_${1}.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '${1}'
 and I have my 'keypair'
 and I have a 'issuer signature' in 'The Authority'
@@ -156,7 +156,7 @@ echo "{\"today\": \"`date +'%s'`\"}" > ./files/uid.json
 ### SCRIPT THAT PRODUCES THE MULTISIGNATURE
 #############################
 
-multisignature="Scenario multidarkroom \n"
+multisignature="Scenario reflow \n"
 
 for user in ${users[@]}
 do
@@ -190,7 +190,7 @@ cp multisignature.json multisignature_input.json
 function participant_sign() {
 	local name=$1
 	cat <<EOF | zexe ./files/sign_session.zen -a ./files/credential_to_sign.json -k ./files/verified_credential_$name.json  | jq . | tee ./files/signature_$name.json
-Scenario multidarkroom
+Scenario reflow
 Given I am '$name'
 and I have my 'verified credential'
 and I have my 'keypair'
@@ -222,7 +222,7 @@ function collect_sign() {
 	cp -v ./files/multisignature.json $tmp_msig
 	json_join ./files/credential.json ./files/signature_$name.json > $tmp_sig
 	cat << EOF | zexe ./files/collect_sign.zen -a $tmp_msig -k $tmp_sig  | jq . | tee ./files/multisignature.json
-Scenario multidarkroom
+Scenario reflow
 Given I have a 'multisignature'
 and I have a 'credential' from 'The Authority'
 and I have a 'signature'
@@ -248,7 +248,7 @@ done
 
 # VERIFY SIGNATURE
 cat << EOF | zexe ./files/verify_sign.zen -a ./files/multisignature.json | jq .
-Scenario multidarkroom
+Scenario reflow
 Given I have a 'multisignature'
 When I verify the multisignature is valid
 Then print 'SUCCESS'

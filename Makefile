@@ -1,9 +1,9 @@
 # run latex enough times to iterate over bibtex
 all:
-	pdflatex multidarkroom
-	bibtex multidarkroom
-	pdflatex multidarkroom
-	pdflatex multidarkroom
+	pdflatex reflow
+	bibtex reflow
+	pdflatex reflow
+	pdflatex reflow
 
 
 # docker pull minlag/mermaid-cli

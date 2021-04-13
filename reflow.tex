@@ -1,5 +1,5 @@
 % /*
-%  * This file is part of multidarkroom
+%  * This file is part of Reflow
 %  * 
 %  * Copyright (C) 2021 Dyne.org foundation
 %  * designed, written and maintained by Denis Roio <jaromil@dyne.org>
@@ -99,7 +99,7 @@
 }
 
 
-\title{Multidarkroom}
+\title{Reflow}
 
 %\date{September 9, 1985}	% Here you can change the date presented in the paper title
 %\date{} 					% Or removing it
@@ -126,15 +126,14 @@
 
 % Uncomment to override  the `A preprint' in the header
 \renewcommand{\headeright}{Dyne.org}
-\renewcommand{\undertitle}{Zero Knowledge Multi Party Signatures with
-  Application to Distributed Ledgers}
-\renewcommand{\shorttitle}{\textit{Multidarkroom}}
+\renewcommand{\undertitle}{Zero Knowledge Multi Party Signatures with Application to Distributed Authentication}
+\renewcommand{\shorttitle}{\textit{Reflow}}
 
 \hypersetup{
-  pdftitle={Multidarkroom - Zero-knowledge proof secured BLS multi-signatures},
+  pdftitle={Reflow multi-party signatures - Secure BLS multi-signatures Zero-knowledge proof },
   pdfsubject={cs.CR},
   pdfauthor={Denis Roio, Alberto Ibrisevic, Andrea D'Intino},
-  pdfkeywords={Cryptography, signatures, zero-knowledge, multi-party, BLS, Coconut},
+  pdfkeywords={Cryptography, signatures, zero-knowledge, multi-party, authentication, REA},
 }
 
 \begin{document}
@@ -145,14 +144,14 @@
 \maketitle
 
 \begin{abstract}
-Multidarkroom is a novel signature scheme supporting unlinkable
+Reflow is a novel signature scheme supporting unlinkable
 signatures by multiple parties authenticated by means of a
-zero-knowledge credential scheme. Multidarkroom integrates with
+zero-knowledge credential scheme. Reflow integrates with
 blockchains to ensure confidentiality, authenticity and availability
 even when credential issuing authorities are offline. We implement and
-evaluate a Multidarkroom smart contract for Zenroom and present an
+evaluate a Reflow smart contract for Zenroom and present an
 application related to multiple anonymous signatures by authenticated
-parties and their non-interactive verification. Multidarkroom uses short
+parties and their non-interactive verification. Reflow uses short
 and computationally efficient authentication credentials and signatures
 application scale linearly over multiple participants.
 \end{abstract}
@@ -182,7 +181,7 @@ among all participants, but granted by one or more authorities through
 credential issuance for the generation of non-interactive and unlinkable
 proofs.
 
-Multidarkroom applies to the signature process a mechanism of credential
+Reflow applies to the signature process a mechanism of credential
 issuance by one or more authorities for the generation of
 non-interactive and unlinkable proofs, resulting in short and
 computationally efficient signatures composed of exactly two group
@@ -204,7 +203,7 @@ verification $40ms$ on average consumer hardware.
 
 \subsection*{Overview}
 
-Multidarkroom provides a production-ready implementation that is easy to embed in end-to-end encryption applications. By making it possible for multiple parties to anonymously authenticate and produce untraceable signatures, its goal is to leverage privacy-by-design scenarios that minimize the information exchange needed for document authentication.
+Reflow provides a production-ready implementation that is easy to embed in end-to-end encryption applications. By making it possible for multiple parties to anonymously authenticate and produce untraceable signatures, its goal is to leverage privacy-by-design scenarios that minimize the information exchange needed for document authentication.
 
 The participation to a signature will be governed by one or more issuers holding keys for the one-time setup of signature credentials. The steps outlined below are represented in figure \ref{fig:credential_diagram}:
 
@@ -238,7 +237,7 @@ The base application of Multidarkdroom is obviously the collective
 signature of digital documents and the signed credential proof will be a
 requirement to participate to any signature process.
 
-A Multidarkroom signature process is best described in 3 main steps:
+A Reflow signature process is best described in 3 main steps:
 session creation, signature and verification.
 
 \paragraph*{1. Anyone creates a session}
@@ -258,7 +257,7 @@ A session may be created by anyone, no credentials are required, but only inform
   \includegraphics[width=0.5\textwidth]{create_session.eps}
 \end{figure}
 
-A Multidarkroom signature session can then be published for verification and its existance may be confidentially communicated to the participants elected to sign it. The possession of the session will allow to disclose the identity of the participants, but only that of the Issuer and the document (or the hash of it) signed.
+A Reflow signature session can then be published for verification and its existance may be confidentially communicated to the participants elected to sign it. The possession of the session will allow to disclose the identity of the participants, but only that of the Issuer and the document (or the hash of it) signed.
 
 \paragraph*{2. Participants sign the session}
 
@@ -286,7 +285,7 @@ are illustrated in figure \ref{fig:verify_sign}.
 A delicate aspect of BLS signatures is avoiding double-signing: if a
 participant signs twice then the whole signature will never be valid.
 Relying on a stateless credential authentication alone does not avoid
-this case in Multidarkroom, therefore we use a list of anonymous
+this case in Reflow, therefore we use a list of anonymous
 "fingerprints" of the signature related to the document being signed.
 Each signature will produce a participant fingerprint saved in a list
 that is checked against duplication before adding a new
@@ -304,18 +303,18 @@ in any moment just by having the document and the session, as
 illustrated in figure \ref{fig:verify_sign} along with the signature
 process.
 
-Configurable features may be introduced in the Multidarkroom signature
+Configurable features may be introduced in the Reflow signature
 flow that may or may not disclose more information, for instance who
 has indicted the signature session, what documents are linked to
 signatures and how many participants were called to sign: this depends
 from the implementation and the metadata it may add to signature
 sessions or the communication protocols adopted.  In any case the
-basic signature and verification flow of Multidarkroom requires that
+basic signature and verification flow of Reflow requires that
 only one identity is really made public and is that of the issuer.
 
 \subsection*{Applications}
 
-Moving further in envisioning the possibilities opened by Multidarkroom
+Moving further in envisioning the possibilities opened by Reflow
 is important to state the possibility to aggregate (sum) signatures into
 compact multi-signatures, a core feature of our BLS based signature
 scheme \citep{compact-multisig}.
@@ -333,13 +332,13 @@ is useful for the realization of privacy-aware applications in various
 sectors, for instance for medical and risk mitigation analysis.
 
 \paragraph*{Material Passport.}
-Drawing on feature of multiple signature aggregation, Multidarkroom can
+Drawing on feature of multiple signature aggregation, Reflow can
 be used to implement a {material passport} for circular economy
 applications \citep{material-passport} to maintain the genealogy of a
 specific product, providing authenticated information about  the whole
 set of actors, tools, collaborations, agreements, efforts and energy
 involved in its production, transportation and disposal
-\citep{reflow-os}.
+\citep{Reflow-os}.
 
 The provision of the information that forms the content of the material
 passport should be done by every actor in the supply chain and among the
@@ -347,7 +346,7 @@ most important technical necessities for such an application are the
 confidentiality issues regarding access to information and the
 guarantees of the quality of information \citep{resources-passport}.
 
-Multidarkroom's unlinkability of credentials and signatures the privacy
+Reflow's unlinkability of credentials and signatures the privacy
 requirement for the material passport, while the possibility to
 aggregate its signatures allows to group multiple signatures into a
 single compact one, without requiring any interaction with the previous
@@ -372,24 +371,24 @@ property: disposability. Disposability permits purpose-specific and
 context-driven authentication, to avoid linking the same identity across
 different authentication contexts \citep{dispid}.
 
-Multidarkroom can be adopted by such an application to remove the need of context-free identifiers and implement authentication functions through a disposable identity whose traceability is bound to a context UID. Furthermore, being a signature scheme, Multidarkroom can add the feature of context-free verifiable signatures (and multi-signatures) that are untraceable in public, but can be traced and even revoked in a known context by the means of context-specific signature fingerprints.
+Reflow can be adopted by such an application to remove the need of context-free identifiers and implement authentication functions through a disposable identity whose traceability is bound to a context UID. Furthermore, being a signature scheme, Reflow can add the feature of context-free verifiable signatures (and multi-signatures) that are untraceable in public, but can be traced and even revoked in a known context by the means of context-specific signature fingerprints.
 
 This scenario is relevant for the implementation of privacy-preserving public sector applications that allow authentication and signatures through disposable identity systems.   
 
 \subsection*{This paper makes three key contributions}
 
 \begin{itemize}
-\item We describe the signature scheme underlying Multidarkroom, including how
+\item We describe the signature scheme underlying Reflow, including how
   key generation, signing and verification operate (Section
   \ref{sec:signature}). The scheme is an application of the BLS signature scheme
   \citep{asiacrypt-bls} fitted with features to grant the unlinkability of
   signatures and to secure it against rogue-key attacks.
-\item We describe the credential scheme underlying Multidarkroom, including how
+\item We describe the credential scheme underlying Reflow, including how
   key generation, issuance, aggregation and verification of credentials operate
   (Section \ref{sec:credential}). The scheme is an application of the Coconut
   credential scheme \citep{coconut-2018} that is general purpose and can be
   scaled to a fully distributed issuance that is re-randomizable.
-\item We implement a Zencode scenario of Multidarkroom to be executed on and
+\item We implement a Zencode scenario of Reflow to be executed on and
   off-chain by the Zenroom VM, complete with functions for public credential
   issuance, signature session creation and multi-party non-interactive signing
   (Section \ref{sec:implementation}). We evaluate the performance and cost of
@@ -674,7 +673,7 @@ standards.
 In addition to considerations on the maturity of EC, the future growth
 of quantum-computing technologies may be able to overcome the Discrete
 Logarithmic assumptions by qualitatively different computational
-means. Multidarkroom then may be vulnerable to quantum-computing
+means. Reflow then may be vulnerable to quantum-computing
 attacks, as well hard to patch, because the pairing-based design sits
 at its core with the adoption of ATE / Miller loop pairing of curves
 in twisted space, a practice that is not covered by research on
@@ -682,7 +681,7 @@ quantum-proof algorithms and will eventually need more time to be
 addressed; however this is all speculative reasoning on what we can
 expect from the future.
 
-The Multidarkroom implementation we are presenting in this paper and
+The Reflow implementation we are presenting in this paper and
 that we have published as a Zenroom scenario ready to use is based on
 the BLS383 curve \citep{bls383} that in the current implementation
 provided by the AMCL library has shown to pass all lab-tests regarding
@@ -690,12 +689,12 @@ pairing properties, a positive result that is not shared with the
 slightly different BLS381-12 curve adopted by ETH2.0. Debating the
 choice of BLS381 is well beyond the scope of this paper, but is worth
 mentioning that our lab-tests have proved also the BLS461 curve to work
-in Multidarkroom: it is based on a 461 bit prime and hence upgrades our
+in Reflow: it is based on a 461 bit prime and hence upgrades our
 implementation to 128 bit security \citep{updating-key-pairings} against
 attacks looking for discrete logs on elliptic curves
 \citep{discrete-log-attack}.
 
-At last the complexity and flexibility of Multidarkroom in its
+At last the complexity and flexibility of Reflow in its
 different applications, its optional use of fingerprint lists,
 multiple UIDs saved from aggregation and other features covering the
 different applications also represent a security risk in the technical
@@ -703,7 +702,7 @@ integration phase. We believe that the adoption of Zenroom and the
 creation of a Zencode scenario addresses well this vulnerability by
 providing an easy to use integrated development environment
 (apiroom.net) and a test-bed for the design of different scenarios of
-application for Multidarkroom that can be deployed correctly granting
+application for Reflow that can be deployed correctly granting
 end-to-end encryption and data minimization according to privacy by
 design guidelines \citep{privbydesign}.
 
@@ -712,7 +711,7 @@ design guidelines \citep{privbydesign}.
 
 % \lstset{basicstyle=\ttfamily\scriptsize, breaklines=true}
 
-In this section we illustrate our implementation of Multidarkroom
+In this section we illustrate our implementation of Reflow
 keygen, sign and verify operations outlining for each:
 
 \begin{itemize}
@@ -724,7 +723,7 @@ keygen, sign and verify operations outlining for each:
 Zencode is actual code executed inside the Zenroom VM, behind its
 implementation the algorithms follow closely the mathematical
 formulation explained in this article and can be reviewed in the free
-and open source code published at Zenroom.org: the Multidarkroom Zencode
+and open source code published at Zenroom.org: the Reflow Zencode
 scenario implementation is contained inside the Zenroom source
 code.
 
@@ -934,7 +933,7 @@ assert( ECP2.miller(PM, UID)
 \section{Evaluation}
 \label{sec:evaluation}
 
-This section lists results of evaluation benchmarks we have run using the Zencode scenario implementation of Multidarkroom on 4 target platforms:
+This section lists results of evaluation benchmarks we have run using the Zencode scenario implementation of Reflow on 4 target platforms:
 \begin{itemize}
   \item \textbf{X86 64bit} on a Intel i5 4th generation
   \item \textbf{ARM 64bit} on a Raspberry Pi 4 board
@@ -944,7 +943,7 @@ This section lists results of evaluation benchmarks we have run using the Zencod
 
 Our benchmarks provide lab measurements for the 3 main steps in the signature flow: for each of them is reported the time of execution (expressed in milliseconds) and the size of output (expressed in bytes) in different conditions with a progressive number $\sigma_N$ of participants (5, 10, 50, 100 signatures).
 
-% All results are produced using the free and open source \emph{AGPLv3 license} Zenroom VM long term support release \emph{version 1.2} and its built-in credentials and multidarkroom scenarios using the zencode scripts released in the zencode_multidarkroom distributed examples.
+% All results are produced using the free and open source \emph{AGPLv3 license} Zenroom VM long term support release \emph{version 1.2} and its built-in credentials and Reflow scenarios using the zencode scripts released in the zencode_reflow distributed examples.
 
 % size progression: 5,10,50,100 participants:
 % byte size & 444 & 603 & 624  \\
