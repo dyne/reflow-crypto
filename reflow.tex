@@ -954,12 +954,70 @@ Our benchmarks provide lab measurements for the 3 main steps in the signature fl
 
 INIZIO ANDREA
 
+\section{Evaluation}
+\label{sec:evaluation}
+
+
+
+This section lists results of evaluation benchmarks we have run using the Zencode scenario implementation of Multidarkroom on 6 target platforms, as a \textbf{Command line interface} (CLI), or a JavaScript-wrapped, Emscripten built \textbf{WASM library}:  
+\begin{itemize}
+  \item   \textbf{X86 64bit binary} CLI on an Intel(R) Core(TM) i5-5300U CPU @ 2.30GHz 
+  \item   \textbf{ARM 32bit binary} CLI on a Raspberry Pi 4 board
+  \item  \textbf{ARM 32bit binary} CLI on a Raspberry Pi 0 board
+  \item  \textbf{WASM 32bit} library on an Intel(R) Core(TM) i5-5300U CPU @ 2.30GHz
+  \item  \textbf{WASM 32bit} library on a Raspberry Pi 4 board
+  \item  \textbf{WASM 32bit} library on a Raspberry Pi 0 board
+\end{itemize}
+
+The use case the CLI application is typically a server-side application or micro-service. The use case of the WASM library can be web application running in the browser, a server-side application running node JS or a mobile application. 
+
+Zenroom may also be built as a native library for Android and iOS (on ARM 32bit, ARM 32bit or X86), but no benchmarks of the Reflow crypto flow have been performed using Zenroom as a native library. In other benchmarks, not published on this paper, we noted similar performances for the native CLI and the native library versions of Zenrooms: we may therefore assume (!!!! VA BENE???)  
+
+Our benchmarks provide lab measurements for the all the steps in the signature flow: for each of them is reported the time of execution (expressed in milliseconds) and the size of output (expressed in bytes) in different conditions with a progressive number of participants (5, 10, 50, 100, 1000 signatures).
+
+The Raspberry 0 and 4 have been chosen as target because of their similarities to, respectively, very low-cost (5 USD) IoT devices and very low cost mobile phones (sub 100 USD).
+
+
+\paragraph {Scripts description} \newline \linebreak
+
+The scripts used in the flow and for bench-marking can be divided in three categories: 
+
+\begin{itemize}
+\item Scripts executed by anyone, marked with (A), include the creation of the Reflow seal (Session start), the aggregation of the signatures (Collect sign) and the verification of the signatures on Reflow seal. Their duration is proportional to the amount of participants and can vary greatly. 
+
+\item Scripts executed by each participant, marked with (P), include participant's setup and signing, they're duration is not correlated with the amount of participants. 
+
+\item Scripts executed by the issuer, marked (I), include issuer's setup and signing, they're duration is not correlated with the amount of participants.
+\end{itemize}
+
+Scripts executed 50 times and got the average, while OS running regularly
+
+
+\paragraph {Considerations} \newline \linebreak
+
+\begin{itemize}
+\item in the (A) group of scripts, the duration grow linearly with the amount of participants. 
+
+\item The benchmarks run on CLI have a comparable duration with their counterparts run on WASM, only when using an X86 machine. The respective durations differ greatly on ARM 32 based Raspberry Pi 0 and 4 machines. We consider this a signal of different level of optimization in the compiling of WASM for X86 and ARM 32.  
+
+\item The main oddity in the benchmark is the duration of the issuer's keygen script on Raspberry Pi 0. Analyzing the reason of this value is beyond the scope of this paper. Nevertheless, since this script contains ECP2 pairing, our future research may include research aiming at optimizing the pairing algorythm or the compiling.   
+\end{itemize}
+
+
+% All results are produced using the free and open source \emph{AGPLv3 license} Zenroom VM long term support release \emph{version 1.2} and its built-in credentials and multidarkroom scenarios using the zencode scripts released in the zencode_multidarkroom distributed examples.
+
+% size progression: 5,10,50,100 participants:
+% byte size & 444 & 603 & 624  \\
+% byte size & 444 & 1171 & 1192  \\
+% byte size & 444 & 4011 & 4032  \\
+% byte size & 444 & 7561 & 7582  \\
+
 \onecolumn
-\newpage 
+\section{Benchmarks}
+\label{sec:benchmarks}
 
-BENCHPESC
 
-CLI X64
+Zenroom CLI X64
 
 \begin{table}[h!]
   \begin{center}
@@ -988,7 +1046,7 @@ CLI X64
 
 
 
-CLI Raspi 4
+Zenroom CLI Raspberry pi 4
 
 \begin{table}[h!]
   \begin{center}
@@ -1014,9 +1072,10 @@ CLI Raspi 4
 
 
 
+\pagebreak
+\newpage
 
-
-CLI Raspi 0
+Zenroom CLI Raspberry pi 0
 
 \begin{table}[h!]
   \begin{center}
@@ -1041,8 +1100,70 @@ CLI Raspi 0
 \end{figure}
 
 
+CLI FIXED
+
+% OLD TABLE IN ONE PIECE
+% \begin{table}[h!]
+%  \begin{center}
+%    \caption{Execution timings on \textbf{CLI} of scripts in $seconds$ per $platform$}
+%      \label{tab:table1}
+%        \begin{tabular} {c|c|c|c|c|c|c|c|c}
+%          \toprule
+% \textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} & \textbf{(I) Keygen}& \textbf{((I) Pub-Key}& \textbf{(I) Sign Req.} \\
+%          \midrule
+%	X64	&	0.0137	&	0.0391	&	0.0196	&	0.0219	&	0.0521	&	0.0129	&	0.0223	&	0.0524	\\
+% Raspberry Pi 4	&	0.0373	&	0.0883	&	0.0475	&	0.0579	&	0.1456	&	0.0404	&	0.0597	&	0.1405	\\
+% Raspberry Pi  0	&	0.2492	&	0.5165	&	0.3017	&	0.3469	&	0.6603	&	0.2467	&	0.3766	&	0.7687	\\
+%      \bottomrule % end of content
+%    \end{tabular}
+%  \end{center}
+% \end{table}
 
 
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Execution timings on \textbf{CLI} of scripts in $seconds$ per $platform$}
+      \label{tab:table1}
+        \begin{tabular} {c|c|c|c|c|c}
+          \toprule
+\textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} \\
+          \midrule
+			X64	&	0.0137	&	0.0391	&	0.0196	&	0.0219	&	0.0521		\\
+Raspberry Pi 4	&	0.0373	&	0.0883	&	0.0475	&	0.0579	&	0.1456		\\
+Raspberry Pi  0	&	0.2492	&	0.5165	&	0.3017	&	0.3469	&	0.6603		\\
+      \bottomrule % end of content
+    \end{tabular}
+  \end{center}
+\end{table}
+
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Execution timings on \textbf{CLI} of scripts in $seconds$ per $platform$}
+      \label{tab:table1}
+        \begin{tabular} {c|c|c|c}
+          \toprule
+\textbf{$script / arch$} & \textbf{(I) Keygen} & \textbf{(I) Pub-Key} & \textbf{(I) Sign Req.} \\
+          \midrule
+			X64	&	0.0129	&	0.0223	&	0.0524	\\
+Raspberry Pi 4	&	0.0404	&	0.0597	&	0.1405	\\
+Raspberry Pi  0	&	0.2467	&	0.3766	&	0.7687	\\
+      \bottomrule % end of content
+    \end{tabular}
+  \end{center}
+\end{table}
+
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=6in, height=2.6in]{graphs/CLIfixed.png}
+    \label{fig:galaxy}
+\end{figure}
+
+\newpage
+\pagebreak
 
 WASM X64
 
@@ -1120,48 +1241,59 @@ WASM Raspi 0
 
 \newpage
 
-CLI FIXED
 
-\begin{table}[h!]
-  \begin{center}
-    \caption{Execution timings on \textbf{CLI} of scripts in $seconds$ per $platform$}
-      \label{tab:table1}
-        \begin{tabular} {c|c|c|c|c|c|c|c|c}
-          \toprule
-\textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} & \textbf{(I) Keygen}& \textbf{((I) Pub-Key}& \textbf{(I) Sign Req.} \\
-          \midrule
-	X64	&	0.0137	&	0.0391	&	0.0196	&	0.0219	&	0.0521	&	0.0129	&	0.0223	&	0.0524	\\
-Raspberry Pi 4	&	0.0373	&	0.0883	&	0.0475	&	0.0579	&	0.1456	&	0.0404	&	0.0597	&	0.1405	\\
-Raspberry Pi  0	&	0.2492	&	0.5165	&	0.3017	&	0.3469	&	0.6603	&	0.2467	&	0.3766	&	0.7687	\\
-      \bottomrule % end of content
-    \end{tabular}
-  \end{center}
-\end{table}
-
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=6in, height=2.6in]{graphs/CLIfixed.png}
-    \label{fig:galaxy}
-\end{figure}
 
 WASM FIXED
+
+% OLD TABLE IN ONE PIECE
+% \begin{table}[h!]
+%   \begin{center}
+%     \caption{Execution timings on \textbf{WASM} of scripts in $seconds$ per $platform$}
+%       \label{tab:table1}
+%         \begin{tabular} {c|c|c|c|c|c|c|c|c}
+%           \toprule
+% \textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} & \textbf{(I) Keygen}& \textbf{((I) Pub-Key}& \textbf{(I) Sign Req.} \\
+%           \midrule
+% X64	&	0.02134	&	0.04906	&	0.02624	&	0.0304	&	0.074510204	&	0.020416667	&	0.03175	&	0.074688889	\\
+% Raspberry Pi  4	&	0.169	&	0.3365	&	0.2095	&	0.173	&	0.2705	&	1.01	&	0.276	&	0.6585	\\
+% Raspberry Pi  0	&	0.6275	&	1.291	&	0.7185	&	0.811	&	1.9435	&	9.958	&	1.101	&	2.6355	\\
+%       \bottomrule % end of content
+%     \end{tabular}
+%   \end{center}
+% \end{table}
 
 \begin{table}[h!]
   \begin{center}
     \caption{Execution timings on \textbf{WASM} of scripts in $seconds$ per $platform$}
       \label{tab:table1}
-        \begin{tabular} {c|c|c|c|c|c|c|c|c}
+        \begin{tabular} {c|c|c|c|c|c}
           \toprule
-\textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} & \textbf{(I) Keygen}& \textbf{((I) Pub-Key}& \textbf{(I) Sign Req.} \\
+\textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} \\
           \midrule
-X64	&	0.02134	&	0.04906	&	0.02624	&	0.0304	&	0.074510204	&	0.020416667	&	0.03175	&	0.074688889	\\
-Raspberry Pi  4	&	0.169	&	0.3365	&	0.2095	&	0.173	&	0.2705	&	1.01	&	0.276	&	0.6585	\\
-Raspberry Pi  0	&	0.6275	&	1.291	&	0.7185	&	0.811	&	1.9435	&	9.958	&	1.101	&	2.6355	\\
+X64				&	0.02134	&	0.04906	&	0.02624	&	0.0304	&	0.074510204		\\
+Raspberry Pi  4	&	0.169	&	0.3365	&	0.2095	&	0.173	&	0.2705		\\
+Raspberry Pi  0	&	0.6275	&	1.291	&	0.7185	&	0.811	&	1.9435		\\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
 \end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Execution timings on \textbf{WASM} of scripts in $seconds$ per $platform$}
+      \label{tab:table1}
+        \begin{tabular} {c|c|c|c}
+          \toprule
+\textbf{$script / arch$} &  \textbf{(I) Keygen}& \textbf{(I) Pub-Key}& \textbf{(I) Sign Req.} \\
+          \midrule
+X64				&		0.020416667	&	0.03175	&	0.074688889	\\
+Raspberry Pi  4	&		1.01	&	0.276	&	0.6585	\\
+Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
+      \bottomrule % end of content
+    \end{tabular}
+  \end{center}
+\end{table}
+
 
 \begin{figure}[h!]
     \centering
@@ -1172,6 +1304,7 @@ Raspberry Pi  0	&	0.6275	&	1.291	&	0.7185	&	0.811	&	1.9435	&	9.958	&	1.101	&	2.6
 
 
 \newpage
+
 
 
 
