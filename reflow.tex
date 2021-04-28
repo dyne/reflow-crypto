@@ -52,6 +52,15 @@
 \usepackage{listings}
 \usepackage{booktabs} % For prettier tables
 
+\usepackage{hyperref} % For hyperlinks
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
 \usepackage{draftwatermark}
 \SetWatermarkText{Draft}
 
@@ -959,48 +968,77 @@ INIZIO ANDREA
 
 
 
-This section lists results of evaluation benchmarks we have run using the Zencode scenario implementation of Multidarkroom on 6 target platforms, as a \textbf{Command line interface} (CLI), or a JavaScript-wrapped, Emscripten built \textbf{WASM library}:  
+The goal of this section was to produce benchmarks of the implementation of the crypto flow, in  realistic conditions of use, so in a way that is similar to how a software solution would use the software. 
+
+Our approach was opposite to testing single algorithms in a sandbox or a profiler, instead we tested Zenroom scripts, written in Zencode, that include also loading and parsing input data from streams or file system, as well as producing output as a deterministically formed JSON object. 
+
+\subsection*{Platforms}
+The three target platforms used for the benchmarks were: 
 \begin{itemize}
-  \item   \textbf{X86 64bit binary} CLI on an Intel(R) Core(TM) i5-5300U CPU @ 2.30GHz 
-  \item   \textbf{ARM 32bit binary} CLI on a Raspberry Pi 4 board
-  \item  \textbf{ARM 32bit binary} CLI on a Raspberry Pi 0 board
-  \item  \textbf{WASM 32bit} library on an Intel(R) Core(TM) i5-5300U CPU @ 2.30GHz
-  \item  \textbf{WASM 32bit} library on a Raspberry Pi 4 board
-  \item  \textbf{WASM 32bit} library on a Raspberry Pi 0 board
+  \item   \textbf{X86-64} on Intel(R) Core(TM) i5-5300U CPU @ 2.30GHz, running Ubuntu 18.04 (64 bit)
+  \item   \textbf{ARM 32bit} on Raspberry Pi 4 board, running Raspberry Pi OS (32bit, kernel version: 5.10)
+  \item  \textbf{ARM 32bit} on Raspberry Pi 0 board, running Raspberry Pi OS (32bit, kernel version: 5.10)
 \end{itemize}
 
-The use case the CLI application is typically a server-side application or micro-service. The use case of the WASM library can be web application running in the browser, a server-side application running node JS or a mobile application. 
+The the X86-64 machine runs on a Lenovo X250 laptop, with 8GB of RAM.  
+The Raspberry 0 and 4 have been chosen as benchmarking platforms because of their similarities to, respectively, very low-cost IoT devices (5 USD) and very low cost mobile phones (sub 100 USD).
 
-Zenroom may also be built as a native library for Android and iOS (on ARM 32bit, ARM 32bit or X86), but no benchmarks of the Reflow crypto flow have been performed using Zenroom as a native library. In other benchmarks, not published on this paper, we noted similar performances for the native CLI and the native library versions of Zenrooms: we may therefore assume (!!!! VA BENE???)  
+\subsection*{Builds} 
 
-Our benchmarks provide lab measurements for the all the steps in the signature flow: for each of them is reported the time of execution (expressed in milliseconds) and the size of output (expressed in bytes) in different conditions with a progressive number of participants (5, 10, 50, 100, 1000 signatures).
+Being a self-contained application written in C, Zenroom can be built for several CPU architectures and operative systems, both as command line interface (CLI) application and as a library. The configurations We chose for this benchmark are: 
 
-The Raspberry 0 and 4 have been chosen as target because of their similarities to, respectively, very low-cost (5 USD) IoT devices and very low cost mobile phones (sub 100 USD).
+\begin{itemize}
+\item Two binary Zenroom CLI, compiled on the GCC toolchain in native 32bit ELF binaries, once for the X86-64 platform and once for the ARMv7-32bit. We refer to these builds as \textbf{Zenroom CLI}. 
 
+\item One mixed library, transcompiled to WASM using the Emscripten toolchain, then built into an NPM package along with a JavaScript wrapper. At build time, the compiled WASM is converted to base64 and embedded in the JavaScript wrapper, which unpacks it at run-time. 
+The library runs in browsers (using the native WASM support, currently present in Chromium/Chrome, Firefox and Safari), as well in node JS based application. We refer to this build as \textbf{Zenroom WASM}. 
+\end{itemize}
 
-\paragraph {Scripts description} \newline \linebreak
+\subsection*{CLI and WASM use cases} 
+
+The use case the CLI application is typically a server-side application or micro-service. The WASM library can run iin the browser, as the client side of a web application, in a server-side application based on node JS or a mobile application.
+
+Zenroom may also be built as a native library for Android and iOS (on ARM 32bit, ARM 32bit or X86), but no benchmarks of the Reflow crypto flow have been performed using Zenroom as a native library. 
+In other benchmarks, not published on this paper, we noted similar performances for the native CLI and the native library versions of Zenrooms: we may therefore assume (!!!! VA BENE???)  
+
+\subsection*{Testing}
+Benchmarking of Zenroom CLI and Zenroom WASM required using two different tools. Both tools performed chained execution of the Zenroom scripts and allowed for parametrized execution, where the amount of participants and the number of recursion cycles can be configured.  
+
+\begin{itemize}
+\item The testing of Zenroom CLI was executed using a single, self-contained \href{https://github.com/dyne/Zenroom/blob/master/test/zencode_reflow/run-recursive.sh}{bash script}. The script outputs the duration of the execution of each Zenroom scripts, along with the memory usage and size of output data, in a CSV formatted summary. The script also saves to files both the data and scripts for quality control reference.
+
+\item The testing of Zenroom WASM required building a \href{https://github.com/dyne/Reflow-Zencode-WASM-benchmark}{JavaScript application}, running in node JS. The application outputs the duration of the execution of each Zenroom scripts, along with the memory usage, it calculate averages and retursn output in a JSON formatted summary.
+\end{itemize}
+
+Benchmarks for the crypto flow were run on both the CLI and the WASM builds of Zenroom, for each platform, for a total of six different data collections. 
+
+\subsection*{Scripts description}
+
+Our benchmarks provide measurements for the all the steps in the signature flow: for each of them is reported the time of execution (expressed in seconds) and the size of output (expressed in bytes) in different conditions with a progressive number of participants (5, 10, 50, 100, 1000 signatures).
 
 The scripts used in the flow and for bench-marking can be divided in three categories: 
 
 \begin{itemize}
-\item Scripts executed by anyone, marked with (A), include the creation of the Reflow seal (Session start), the aggregation of the signatures (Collect sign) and the verification of the signatures on Reflow seal. Their duration is proportional to the amount of participants and can vary greatly. 
+\item Scripts with \textbf{variable execution times} executed by anyone and marked with (A), include the creation of the Reflow seal (Session start), the aggregation of the signatures (Collect sign) and the verification of the signatures on Reflow seal. Their duration is proportional to the amount of participants and can vary greatly. These scripts are the most calculation intensive ones and expected to typically run server-side.
 
-\item Scripts executed by each participant, marked with (P), include participant's setup and signing, they're duration is not correlated with the amount of participants. 
+\item Scripts executed by each participant, marked with (P), include participant's setup and signing, they're duration is not correlated with the amount of participants. These scripts are expected to typically run in the browser or on mobile devices.
 
-\item Scripts executed by the issuer, marked (I), include issuer's setup and signing, they're duration is not correlated with the amount of participants.
+\item Scripts executed by the issuer, marked (I), include issuer's setup and signing, they're duration is not correlated with the amount of participants. These scripts are expected to typically run server-side.
 \end{itemize}
 
-Scripts executed 50 times and got the average, while OS running regularly
+Each scripts was executed 50 times, on each platform and each configuration, an the average execution time was extracted.
 
 
-\paragraph {Considerations} \newline \linebreak
+
+\subsection*{Findings}
 
 \begin{itemize}
-\item in the (A) group of scripts, the duration grow linearly with the amount of participants. 
+\item The execution time of the scripts in the (A) group, grows linearly with the amount of participants. 
 
-\item The benchmarks run on CLI have a comparable duration with their counterparts run on WASM, only when using an X86 machine. The respective durations differ greatly on ARM 32 based Raspberry Pi 0 and 4 machines. We consider this a signal of different level of optimization in the compiling of WASM for X86 and ARM 32.  
+\item On a X86-64 machine, the benchmarks execute on Zenroom CLI have a comparable duration with their counterparts run on WASM. The execution times differ otherwise greatly between Zenroom CLI and Zenroom WASM, on the ARM 32bit based Raspberry Pi 0 and 4 machines. 
+While investigating the cause of the differences is beyond the purpose of this paper, we speculate this as signaling different levels of optimization, for the of WASM interpreters built for X86-64 on one hand, and ARM 32bit on the other.  
 
-\item The main oddity in the benchmark is the duration of the issuer's keygen script on Raspberry Pi 0. Analyzing the reason of this value is beyond the scope of this paper. Nevertheless, since this script contains ECP2 pairing, our future research may include research aiming at optimizing the pairing algorythm or the compiling.   
+\item The most numerically outstanding benchmark is the execution time of the issuer's keygen script on Raspberry Pi 0, when compared with the other platform. Once more, investigating the reason for this discrepancy is beyond the scope of this paper: we speculate ECP2 pairing performed in script may justify it.
 \end{itemize}
 
 
@@ -1016,8 +1054,11 @@ Scripts executed 50 times and got the average, while OS running regularly
 \section{Benchmarks}
 \label{sec:benchmarks}
 
+Following are the benchmarks of the benchmarks for the (A) group of scripts (whose execution times change based on the amount of participants), running in CLI binaries, grouped by platform.
 
-Zenroom CLI X64
+
+\subsection*{Zenroom CLI X86-64}
+
 
 \begin{table}[h!]
   \begin{center}
@@ -1027,9 +1068,9 @@ Zenroom CLI X64
           \toprule
            \textbf{$_S / _P$} & \textbf{2} & \textbf{10} & \textbf{50} & \textbf{100} & \textbf{1000} & \textbf{5000} \\
           \midrule
-          session\_start.zen & 0.0188 & 0.0253 & 0.0410 & 0.0623 & 0.1056 & 0.5039 \\
-          collect\_sign.zen & 0.0729 & 0.0730 & 0.1031 & 0.1373 & 0.7435 & 3.6061 \\
-          verify\_sign.zen & 0.0405 & 0.0515 & 0.0996 & 0.1619 & 1.3974 & 7.0460 \\
+          (A) Session start & 0.0188 & 0.0253 & 0.0410 & 0.0623 & 0.1056 & 0.5039 \\
+          (A) Collect sign & 0.0729 & 0.0730 & 0.1031 & 0.1373 & 0.7435 & 3.6061 \\
+          (A) Verify sign & 0.0405 & 0.0515 & 0.0996 & 0.1619 & 1.3974 & 7.0460 \\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
@@ -1045,20 +1086,20 @@ Zenroom CLI X64
 
 
 
+\subsection*{Zenroom CLI Raspberry Pi 4}
 
-Zenroom CLI Raspberry pi 4
 
 \begin{table}[h!]
   \begin{center}
-    \caption{Execution timings on \textbf{CLI Raspberry 4} in $seconds$ per $participant$}
+    \caption{Execution times on \textbf{CLI Raspberry 4} in $seconds$ per $participant$}
       \label{tab:table1}
         \begin{tabular} {c|c|c|c|c|c}
           \toprule
            \textbf{$_S / _P$} & \textbf{2} & \textbf{10} & \textbf{50} & \textbf{100} & \textbf{1000} \\
           \midrule
-          session\_start.zen & 0.0516 & 0.0602 & 0.0674 & 0.0750 & 0.2762 \\
-          collect\_sign.zen & 0.2087 & 0.2273 & 0.3031 & 0.3942 & 2.1849 \\
-          verify\_sign.zen & 0.1049 & 0.1393 & 0.2978 & 0.4831 & 4.0688 \\
+          (A) Session start & 0.0516 & 0.0602 & 0.0674 & 0.0750 & 0.2762 \\
+          (A) Collect sign & 0.2087 & 0.2273 & 0.3031 & 0.3942 & 2.1849 \\
+          (A) Verify sign & 0.1049 & 0.1393 & 0.2978 & 0.4831 & 4.0688 \\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
@@ -1075,19 +1116,19 @@ Zenroom CLI Raspberry pi 4
 \pagebreak
 \newpage
 
-Zenroom CLI Raspberry pi 0
+\subsection*{Zenroom CLI Raspberry Pi 0}
 
 \begin{table}[h!]
   \begin{center}
-    \caption{Execution timings on \textbf{CLI X64} in $seconds$ per $participant$}
+    \caption{Execution times for\textbf{Zenroom CLI Raspberry Pi 0} in $seconds$ per $participant$}
       \label{tab:table1}
         \begin{tabular} {c|c|c|c|c|c}
           \toprule
            \textbf{$_S / _P$} & \textbf{2} & \textbf{10} & \textbf{50} & \textbf{100} & \textbf{1000} \\
           \midrule
-          session\_start.zen & 0.2760 & 0.2936 & 0.3413 & 0.3725 & 1.3097 \\
-          collect\_sign.zen & 1.0439 & 1.1458 & 1.3688 & 1.7669 & 9.6403 \\
-          verify\_sign.zen & 0.5753 & 0.7199 & 1.3381 & 2.1971 & 17.8956 \\
+          (A) Session start & 0.2760 & 0.2936 & 0.3413 & 0.3725 & 1.3097 \\
+          (A) Collect sign & 1.0439 & 1.1458 & 1.3688 & 1.7669 & 9.6403 \\
+          (A) Verify sign & 0.5753 & 0.7199 & 1.3381 & 2.1971 & 17.8956 \\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
@@ -1100,7 +1141,9 @@ Zenroom CLI Raspberry pi 0
 \end{figure}
 
 
-CLI FIXED
+\subsection*{Zenroom CLI - all platforms}
+
+Following are the benchmarks of the benchmarks for the (P) and the (I) groups of scripts (whose execution times don't change based on the amount of participants), with a comparison of all the platforms, running in CLI binaries.
 
 % OLD TABLE IN ONE PIECE
 % \begin{table}[h!]
@@ -1127,9 +1170,9 @@ CLI FIXED
       \label{tab:table1}
         \begin{tabular} {c|c|c|c|c|c}
           \toprule
-\textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} \\
+\textbf{$script / platf.$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} \\
           \midrule
-			X64	&	0.0137	&	0.0391	&	0.0196	&	0.0219	&	0.0521		\\
+			X86-X64	&	0.0137	&	0.0391	&	0.0196	&	0.0219	&	0.0521		\\
 Raspberry Pi 4	&	0.0373	&	0.0883	&	0.0475	&	0.0579	&	0.1456		\\
 Raspberry Pi  0	&	0.2492	&	0.5165	&	0.3017	&	0.3469	&	0.6603		\\
       \bottomrule % end of content
@@ -1165,7 +1208,9 @@ Raspberry Pi  0	&	0.2467	&	0.3766	&	0.7687	\\
 \newpage
 \pagebreak
 
-WASM X64
+Following are the benchmarks of the benchmarks for the (A) group of scripts (whose execution times change based on the amount of participants), running in WASM libraries, grouped by platform.
+
+\subsection*{Zenroom WASM X86-64}
 
 \begin{table}[h!]
   \begin{center}
@@ -1175,9 +1220,9 @@ WASM X64
           \toprule
            \textbf{$_S / _P$} & \textbf{2} & \textbf{10} & \textbf{50} & \textbf{100} & \textbf{1000} \\
           \midrule
-          session\_start.zen & 0.0324 & 0.0312 & 0.0373 & 0.0516 & 0.1749 \\
-          collect\_sign.zen & 0.1180 & 0.1092 & 0.1510 & 0.2467 & 1.1563 \\
-          verify\_sign.zen & 0.0695 & 0.0688 & 0.1495 & 0.2641 & 2.1554 \\
+          (A) Session start & 0.0324 & 0.0312 & 0.0373 & 0.0516 & 0.1749 \\
+          (A) Collect sign & 0.1180 & 0.1092 & 0.1510 & 0.2467 & 1.1563 \\
+          (A) Verify sign & 0.0695 & 0.0688 & 0.1495 & 0.2641 & 2.1554 \\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
@@ -1191,7 +1236,7 @@ WASM X64
 
 \newpage
 
-WASM Raspi 4
+\subsection*{Zenroom WASM Rasperry Pi 4}
 
 \begin{table}[h!]
   \begin{center}
@@ -1201,9 +1246,9 @@ WASM Raspi 4
           \toprule
            \textbf{$_S / _P$} & \textbf{2} & \textbf{10} & \textbf{50} & \textbf{100} & \textbf{1000} \\
           \midrule
-          session\_start.zen & 0.1065 & 0.1092 & 0.1269 & 0.1459 & 0.5432 \\
-          collect\_sign.zen & 0.3897 & 0.4170 & 0.5741 & 0.7654 & 4.3594 \\
-          verify\_sign.zen & 0.1880 & 0.2510 & 0.5621 & 0.9494 & 8.1078 \\
+          (A) Session start & 0.1065 & 0.1092 & 0.1269 & 0.1459 & 0.5432 \\
+          (A) Collect sign & 0.3897 & 0.4170 & 0.5741 & 0.7654 & 4.3594 \\
+          (A) Verify sign & 0.1880 & 0.2510 & 0.5621 & 0.9494 & 8.1078 \\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
@@ -1215,7 +1260,7 @@ WASM Raspi 4
     \label{fig:galaxy}
 \end{figure}
 
-WASM Raspi 0
+\subsection*{Zenroom WASM Rasperry Pi 0}
 
 \begin{table}[h!]
   \begin{center}
@@ -1225,9 +1270,9 @@ WASM Raspi 0
           \toprule
            \textbf{$_S / _P$} & \textbf{2} & \textbf{10} & \textbf{50} & \textbf{100} & \textbf{1000} \\
           \midrule
-          session\_start.zen & 0.8688 & 0.8711 & 1.0392 & 1.2257 & 4.7067 \\
-          collect\_sign.zen & 2.7272 & 2.8665 & 3.9580 & 5.1851 & 29.0912 \\
-          verify\_sign.zen & 1.3818 & 1.7820 & 3.8503 & 6.3604 & 53.8938 \\
+          (A) Session start & 0.8688 & 0.8711 & 1.0392 & 1.2257 & 4.7067 \\
+          (A) Collect sign & 2.7272 & 2.8665 & 3.9580 & 5.1851 & 29.0912 \\
+          (A) Verify sign & 1.3818 & 1.7820 & 3.8503 & 6.3604 & 53.8938 \\
       \bottomrule % end of content
     \end{tabular}
   \end{center}
@@ -1242,8 +1287,9 @@ WASM Raspi 0
 \newpage
 
 
+\subsection*{Zenroom WASM - all platforms}
 
-WASM FIXED
+Following are the benchmarks of the benchmarks for the (P) and the (I) groups of scripts (whose executions don't change based on the amount of participants), with a comparison of all the platforms, running in CLI binaries.
 
 % OLD TABLE IN ONE PIECE
 % \begin{table}[h!]
@@ -1264,13 +1310,13 @@ WASM FIXED
 
 \begin{table}[h!]
   \begin{center}
-    \caption{Execution timings on \textbf{WASM} of scripts in $seconds$ per $platform$}
+    \caption{Execution times on \textbf{Zenroom WASM} of scripts in $seconds$ per $platform$}
       \label{tab:table1}
         \begin{tabular} {c|c|c|c|c|c}
           \toprule
-\textbf{$script / arch$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} \\
+\textbf{$script / platf.$} & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} \\
           \midrule
-X64				&	0.02134	&	0.04906	&	0.02624	&	0.0304	&	0.074510204		\\
+X86-X64			&	0.0213	&	0.0490	&	0.0262	&	0.0304	&	0.0745		\\
 Raspberry Pi  4	&	0.169	&	0.3365	&	0.2095	&	0.173	&	0.2705		\\
 Raspberry Pi  0	&	0.6275	&	1.291	&	0.7185	&	0.811	&	1.9435		\\
       \bottomrule % end of content
@@ -1280,13 +1326,13 @@ Raspberry Pi  0	&	0.6275	&	1.291	&	0.7185	&	0.811	&	1.9435		\\
 
 \begin{table}[h!]
   \begin{center}
-    \caption{Execution timings on \textbf{WASM} of scripts in $seconds$ per $platform$}
+    \caption{Execution times on \textbf{Zenroom WASM} of scripts in $seconds$ per $platform$}
       \label{tab:table1}
         \begin{tabular} {c|c|c|c}
           \toprule
-\textbf{$script / arch$} &  \textbf{(I) Keygen}& \textbf{(I) Pub-Key}& \textbf{(I) Sign Req.} \\
+\textbf{$script / platf$} &  \textbf{(I) Keygen}& \textbf{(I) Pub-Key}& \textbf{(I) Sign Req.} \\
           \midrule
-X64				&		0.020416667	&	0.03175	&	0.074688889	\\
+X86-X64				&		0.0204	&	0.0317	&	0.0746	\\
 Raspberry Pi  4	&		1.01	&	0.276	&	0.6585	\\
 Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
       \bottomrule % end of content
@@ -1304,7 +1350,6 @@ Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
 
 
 \newpage
-
 
 
 
