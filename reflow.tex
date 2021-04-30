@@ -340,6 +340,29 @@ least privilege to the access of information \citep{info-protection} and
 is useful for the realization of privacy-aware applications in various
 sectors, for instance for medical and risk mitigation analysis.
 
+
+\paragraph*{Disposable Identities}
+
+A Disposable Identity is based on four properties common to other
+authentication and identification systems: verifiability, privacy,
+transparency, trustworthiness; then in addition introduces a fifth
+property: disposability. Disposability permits purpose-specific and
+context-driven authentication, to avoid linking the same identity across
+different authentication contexts \citep{dispid}.
+
+Reflow can be adopted by such an application to remove the need of
+context-free identifiers and implement authentication functions through
+a disposable identity whose traceability is bound to a context UID.
+Furthermore, being a signature scheme, Reflow can add the feature of
+context-free verifiable signatures (and multi-signatures) that are
+untraceable in public, but can be traced and even revoked in a known
+context by the means of context-specific signature fingerprints.
+
+This scenario is relevant for the implementation of privacy-preserving
+public sector applications that allow authentication and signatures
+through disposable identity systems.   
+
+
 \paragraph*{Material Passport.}
 Drawing on feature of multiple signature aggregation, Reflow can
 be used to implement a {material passport} for circular economy
@@ -355,34 +378,52 @@ most important technical necessities for such an application are the
 confidentiality issues regarding access to information and the
 guarantees of the quality of information \citep{resources-passport}.
 
-Reflow's unlinkability of credentials and signatures the privacy
-requirement for the material passport, while the possibility to
-aggregate its signatures allows to group multiple signatures into a
-single compact one, without requiring any interaction with the previous
-signers. The product signature will then be the sum of all materials
-composing or consumed for it and it will be the authenticated and
-immutable track record of all materials composing the product.
+As an ideally simple and effective ontology we adopt ValueFlows to organize
+knowledge in a graph made of 4 main type of nodes:
 
 \begin{enumerate}
-  \item One may choose a list of signed materials to compose them in a product
-  \item One aggregates all signatures of the materials into the product signature
-  \item One saves a list of all UIDs for each material along with its information
-  \item One may publish the signed material passport created this way 
-  \item Anyone may verify the integrity of the material passport
+  \item Events that are the mean of creation and transormation of Resources
+  \item Agents capable of creating Events and Processes
+  \item Processes where more than one Agent can consume and create Events
 \end{enumerate}
 
-\paragraph*{Disposable Identities}
+We then consider Resources as material passports made of the track and
+trace of all nodes - Events, Agents and Processes - they descend from.
+The  material passport is an authenticated graph structure: in figure
+\ref{fig:valueflows} the Resources on the right side have an UID which
+is the aggregation of all UIDs of elements leading to their existance.
 
-A Disposable Identity is based on four properties common to other
-authentication and identification systems: verifiability, privacy,
-transparency, trustworthiness; then in addition introduces a fifth
-property: disposability. Disposability permits purpose-specific and
-context-driven authentication, to avoid linking the same identity across
-different authentication contexts \citep{dispid}.
+\begin{figure}
+  \caption{Valueflows}
+  \label{fig:valueflows}
+  \centering
+  \includegraphics[width=0.5\textwidth]{valueflows.eps}
+\end{figure}
 
-Reflow can be adopted by such an application to remove the need of context-free identifiers and implement authentication functions through a disposable identity whose traceability is bound to a context UID. Furthermore, being a signature scheme, Reflow can add the feature of context-free verifiable signatures (and multi-signatures) that are untraceable in public, but can be traced and even revoked in a known context by the means of context-specific signature fingerprints.
+The integrity of the material passport can be verified by recalculating
+the UID aggregation and see it matches the signed one attached to the
+Resource. In case one or more UIDs are wrong or missing, the Resource
+will not verify as valid. In brief is possible that:
 
-This scenario is relevant for the implementation of privacy-preserving public sector applications that allow authentication and signatures through disposable identity systems.   
+\begin{enumerate}
+  \item One or more Agents may interact to create material passports
+  \item A material passport is the aggregation of all parent nodes
+  \item Anyone may verify the integrity and validity of a material passport
+  \item The verification of a material passport does not reveal the identity of Agents signing it
+  \item One may export and import a material passport as a graph query
+\end{enumerate}
+
+Reflow's unlinkability of credentials and signatures satisfy the privacy
+requirement for the material passport, while the possibility to
+aggregate and link all the elements of its graph allow to group multiple
+signatures into a single compact one, without requiring any interaction
+with the previous signers. The material passport signature will then be
+the sum of all Agents, Processes and Events involved, created or
+consumed for it. The Reflow material passport is the authenticated,
+immutable and portable track record of all nodes connected in its graph:
+material passports can be signed on export and verified on import, which
+makes them reliably portable from one graph to another in a federated
+environment.
 
 \subsection*{This paper makes three key contributions}
 
