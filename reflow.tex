@@ -1392,7 +1392,54 @@ Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
 
 \newpage
 
+\subsection*{RAM usage}
 
+\begin{table}[h!]
+  \begin{center}
+    \caption{Execution timings on \textbf{RAM Usage} in $KiloBytes$ per $participant$}
+      \label{tab:table1}
+        \begin{tabular} {c|c|c|c|c|c|c}
+          \toprule
+           \textbf{$_K_B/ _P$} & \textbf{2} & \textbf{10} & \textbf{50} & \textbf{100} & \textbf{1000} & \textbf{5000} \\
+          \midrule
+            (A) Session start & 500 KB & 507 KB & 534 KB & 589 KB & 1289 KB & 4543 KB \\	
+            (A) Collect sign & 520 KB & 548 KB & 665 KB & 817 KB & 1651 KB & 4368 KB	\\		
+            (A) Verify sign & 507 KB & 532 KB & 653 KB & 801 KB & 1660 KB & 4695 KB	\\
+      \bottomrule % end of content
+    \end{tabular}
+  \end{center}
+\end{table}
+
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Execution times on \textbf{RAM Usage} in $KiloBytes$}
+      \label{tab:table1}
+        \begin{tabular} {c|c|c|c|c|c}
+          \toprule
+         & \textbf{(P) Keygen} & \textbf{(P) Request} & \textbf{(P) Pub-Key} & \textbf{(P) Aggr. Cred.} & \textbf{(P) Sign Session} \\
+          \midrule
+ 			& 498 KB	&  512 KB	&  484 KB	&  497 KB	&  541 KB	\\
+
+
+      \bottomrule % end of content
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Execution times on \textbf{RAM Usage} in $KiloBytes$}
+      \label{tab:table1}
+        \begin{tabular} {c|c|c|c}
+          \toprule
+          &  \textbf{(I) Keygen}& \textbf{(I) Pub-Key}& \textbf{(I) Sign Req.} \\
+          \midrule
+				&	488 KB	&  491 KB	&  504 KB	\\
+      \bottomrule % end of content
+    \end{tabular}
+  \end{center}
+\end{table}
 
 
 
