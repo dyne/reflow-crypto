@@ -408,8 +408,8 @@ will not verify as valid. In brief is possible that:
 \begin{enumerate}
   \item One or more Agents may interact to create material passports
   \item A material passport is the aggregation of all parent nodes
-  \item Anyone may verify the integrity and validity of a material passport
-  \item The verification of a material passport does not reveal the identity of Agents signing it
+  \item Anyone may verify the integrity and validity of any material passport
+  \item The verification of a material passport does not reveal the identity of Agents contained
   \item One may export and import a material passport as a graph query
 \end{enumerate}
 
@@ -765,25 +765,28 @@ In this section we illustrate our implementation of Reflow
 keygen, sign and verify operations outlining for each:
 
 \begin{itemize}
-  \item the communication sequence diagram
- % \item the Zenroom code (Lua dialect script)
-  \item the Zencode statements composing the sequence 
+  \item the communication sequence diagram when necessary
+  \item the Zencode statements to operate the transformation
 \end{itemize}
 
 Zencode is actual code executed inside the Zenroom VM, behind its
-implementation the algorithms follow closely the mathematical
+implementation the algorithms follow very closely the mathematical
 formulation explained in this article and can be reviewed in the free
-and open source code published at Zenroom.org: the Reflow Zencode
-scenario implementation is contained inside the Zenroom source
-code.
+and open source code published at Zenroom.org. The Reflow Zencode
+scenario implementation is contained inside the Zenroom source code.
+
+To execute an example flow on one's own computer it is enough to visit
+the website ApiRoom.net and select the Reflow scenario examples,
+pressing play it will execute zencode and show input and outputs in
+JSON format.
 
 \subsection*{Credential Setup}
 
-We begin with the Credential Setup sequence which has to be executed
-only once to enable participants to produce signatures. This sequence is
-briefly illustrated with a diagram and it consists in the creation of
-keypair for both the Issuer, who will sign the participant credentials,
-and the participant who will request an issuer credential.
+The Credential Setup sequence which has to be executed only once to
+enable participants to produce signatures. This sequence is briefly
+illustrated with a diagram and it consists in the creation of keypair
+for both the Issuer, who will sign the participant credentials, and
+the participant who will request an issuer credential.
 
 \begin{lstlisting}[style=zencode,caption={Issuer Keygen}]
 Given I am 'The Issuer'
@@ -798,20 +801,28 @@ Executed by the Zencode utterance:
 It will create a new \emph{issuer keypair} that can be used to sign
 each new \emph{credential request}. Its public member \emph{.verify}
 should be public and know to anyone willing to verify the credentials
-of signers.
+of signers. It can be safely separated from the secret key and
+exported with:
 
-\textbf{Keygen:} Generate a credential request and have it signed by
-an Issuer, as well generate a BLS keypair used to sign documents. This
-procedure will generate private keys that should not be communicated,
-as well public BLS keys that can be aggregated for signature
-verification.
+\begin{lstlisting}[style=zencode,caption={Issuer verifier}]
+Scenario credential: publish verifier
+Given that I am known as 'The Issuer'
+and I have my 'keys'
+When I create the issuer public key
+Then print my 'issuer public key'
+\end{lstlisting}
 
-Figure~\ref{fig:keygen} illustrates how this process consists of two
-different function calls: \verb!keygen! to create an ElGamal keypair
-and \verb!prepare_blind_sign! to generate a Coconut credential
-request. An interactive exchange takes place between the Signer and
-the Issuer that verifies the possession of the secret ElGamal key and
-signs a credential to witness this condition.
+\textbf{Credential signature:} Generate a credential request and have
+it signed by an Issuer, as well generate all the keys used to sign
+documents. This procedure will generate private keys that should not
+be communicated, as well BLS keys whose public section should be
+communicated and can be later aggregated to create a seal (signature
+session) and verify one.
+
+Figure~\ref{fig:keygen} illustrates how this process unfolds in a
+sequence of communication. An interactive exchange takes place between
+the Signer and the Issuer that verifies the possession of the secret
+Reflow key and signs a credential to witness this condition.
 
 \begin{figure}
   \caption{Keygen process sequence diagram}
@@ -822,56 +833,56 @@ signs a credential to witness this condition.
 
 The public key of the Issuer which is used to sign the credential
 should have been public and known by the Signer at the beginning of
-the keygen process, while at the end of this process the public
-ElGamal key should be published, i.e. on a distributed ledger.
-
-The following Zenroom implementation makes use of the Coconut
-built-in extension for zero-knowledge proof credentials.
-
-\begin{lstlisting}[basicstyle=\tiny,style=lua]
-ZK = require_once('crypto_abc')
-issuer = ZK.issuer_keygen() -- setup
-sk = INT.random() -- signing key
-ck = INT.random() -- credential key
-PK = G2 * sk     -- signature verifier
-Lambda =
- ZK.prepare_blind_sign(ck * G1, ck)
-SigmaTilde =
- ZK.blind_sign(issuer.sign, Lambda)
-Sigma =
- ZK.aggregate_creds(ck, {SigmaTilde})
-\end{lstlisting}
+the Keygen process.
 
 This code is executed in multiple steps by the Zencode utterances:
 
 \begin{enumerate}
 
-\item \textbf{When I create the credential keypair}
+\item \textbf{When I create the reflow key}
+  \\ \textbf{and I create the credential key}
 
-  will create a new \emph{credential keypair} object containing
-  members \emph{public} (ECP) and \emph{private} (BIG).
+  will create inside the \emph{keys} data structure two new secret
+  keys: the \emph{credential} and the \emph{bls} keys both consisting
+  of \emph{BIG} integers. Secret keys are randomically chosen
+  uniformly in $\mathbb{F}_n$, where $n$ is the order of the group
+  $\mathbb{G}_1$.
 
 \item \textbf{When I create the credential request}
 
-  will use the \emph{credential keypair} to create a new
-  \emph{credential request} complex schema object for ZK proof.
+  will use the \emph{secret keys} to create a new \emph{credential
+    request} consisting of a $\lambda$ containing a zero-knowledge
+  proof $\pi_s$ of the authenticity of Signer $i$ owning keys
+  $(sk_i, PK_i)$ and requesting the Issuer to sign its secret
+  attribute $ck_i\in\mathbb{Z}$. The Issuer may request additional
+  communications held on a \emph{side channel} in order to establish
+  proof-of-possession and the authenticity of the Signer, for instance
+  a challenge session in which a random message is demonstrably signed
+  by the secret credential key using an El-Gamal signature
+  \citep{elgamal} and verified by the public key.
 
-\item \textbf{When I create the credential signature}
+\item \textbf{Given I have a 'credential request'}
+ \\ \textbf{When I create the credential signature}
+ \\ \textbf{and I create the issuer public key}
 
-  will be executed by the Issuer after the proof-of-possession
-  challenge is positive (exchange and confirmation of an encrypted
-  message using BLS public keys) to sign the credential.
+  will be executed by the Issuer to sign the credential after the
+  proof-of-possession challenge is positive. It consists of a
+  $\tilde{\sigma}$ signed used the Issuer's own secret key $sk$ after
+  verifying the proof $\pi_s$ inside the received $\lambda$.
 
-\item \textbf{When I create the credentials}
+\item \textbf{Given I have a 'credential signature}
+ \\ \textbf{When I create the credentials}
 
-  will aggregate one or more \emph{credential signature} (SigmaTilde)
-  together with the \emph{private} member of the \emph{credential
-    keypair} and finally create \emph{credentials} capable of
-  producing Zero-Knowledge proofs of possession.
-
+ will be executed by the Signer to aggregate one or more
+ \emph{credential signature} into the secret \emph{keys} structure.
+ The \emph{credentials} consist of a $\sigma_{ck}$ that should be
+ stored locally and secretly as it will be later required to create
+ the zero-knowledge proof components $\theta$ and $\zeta$ that
+ authenticate the Reflow signature against rogue-key attacks.
 \end{enumerate}
 
-
+\subsection{Signature}
+At this point the 
 
 \textbf{Sign:}
 
@@ -891,94 +902,6 @@ This code is executed in multiple steps by the Zencode utterances:
 
 
 
-\begin{lstlisting}[style=lua]
-
----------
--- SETUP
----------
-
-G1 = ECP.generator()
-G2 = ECP2.generator()
-
--- credentials
-ZK = require_once('crypto_abc')
-issuer = ZK.issuer_keygen()
-
--- keygen
-sk1 = INT.random() -- signing key
-ck1 = INT.random() -- credential key
-PK1 = G2 * sk1     -- signature verifier
-
-sk2 = INT.random()
-ck2 = INT.random()
-PK2 = G2 * sk2
-
--- issuer sign ZK credentials
-Lambda1 = ZK.prepare_blind_sign(ck1*G1, ck1) -- credential request:       p -> i
-SigmaTilde1 = ZK.blind_sign(issuer.sign, Lambda1)    -- issuer signs credential:  i -> p
-Sigma1 = ZK.aggregate_creds(ck1, {SigmaTilde1})  -- credential sigma          p -> store
-
-Lambda2 = ZK.prepare_blind_sign(ck2*G1, ck2)
-SigmaTilde2 = ZK.blind_sign(issuer.sign, Lambda2)
-Sigma2 = ZK.aggregate_creds(ck2, {SigmaTilde2})
-
--- sign
-
-UID = ECP.hashtopoint(msg) -- the message's hash is the unique identifier
-
---------------
--- SETUP done
---------------
-
-print "--------------------------"
-print "first base signing session"
-r = INT.random()
-R = UID * r      -- session
-
--- add public keys to public session key
-PM = (G2 * r) + PK1 + PK2
-
--- Session opener broadcasts:
--- 1. R   - base G1 point for signature session
--- 2. PM  - base G2 point for public multi-signature key
--- 3. msg - the message to be signed
-
--- proofs of valid signature
--- uses public session key as UID
-Proof1,z1 = ZK.prove_cred_uid(issuer.verify, Sigma1, ck1, UID)
-Proof2,z2 = ZK.prove_cred_uid(issuer.verify, Sigma2, ck2, UID)
--- each signer signs
-S1 = UID * sk1
-S2 = UID * sk2
-
--- generate the signature
--- each signer will communicate: UID * sk
-SM = R + S1 + S2
-
-
--- print signature contents to screen
-I.print({pub = PM, -- session public keys
-		 sign = SM,
-		 uid = UID,
-		 proofhash1 = sha256( ZEN.serialize( Proof1 ) ),
-		 proofhash2 = sha256( ZEN.serialize( Proof2 ) ),
-		 zeta1 = z1,
-		 zeta2 = z2,
-		 issuer = issuer.verify
-})
-
--- verify
-assert( ZK.verify_cred_uid(issuer.verify, Proof1, z1, UID),
-		"first proof verification fails")
-assert( ZK.verify_cred_uid(issuer.verify, Proof2, z2, UID),
-		"second proof verification fails")
-assert( ECP2.miller(PM, UID)
-		   == ECP2.miller(G2, SM),
-        "Signature doesn't validates")
-
-\end{lstlisting}
-
-\pagebreak
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -1092,6 +1015,7 @@ While investigating the cause of the differences is beyond the purpose of this p
 % byte size & 444 & 7561 & 7582  \\
 
 \onecolumn
+
 \section{Benchmarks}
 \label{sec:benchmarks}
 
@@ -1441,13 +1365,11 @@ Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
   \end{center}
 \end{table}
 
-
-
-FINE ANDREA
-
 \newpage
 
+\twocolumn
 
+\section{Conclusion}
 
 
 

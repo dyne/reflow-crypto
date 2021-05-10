@@ -1,12 +1,8 @@
 sequenceDiagram
   participant A as Alice
   participant I as Issuer
-  participant P as Public
-  I->>P: Issuer verifier (V)
-  A->>A: sk, PK = keygen(), Lambda = prepare_blind_sign(ck)
-  A->>I: credential signature request: PK, Lambda
-  I->>A: challenge = crypt(PK, message)
-  A->>I: message = decrypt(sk, challenge)
-  I->>A: SigmaTilde = sign(Lambda) -- proof of possession
-  A->>A: Sigma = aggregate_credential(ck, SigmaTilde)
-  I->>P: PK + PKn -- aggregated PKs
+  A->>A: Reflow key generation (1)
+  A->>+I: Credential signature request (2)
+  I-->A: Challenge (side channel)
+  I->>-A: Reply with signed credential (3)
+  A->>A: Safe storage of signed credential (4)
