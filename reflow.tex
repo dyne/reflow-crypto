@@ -1129,6 +1129,24 @@ While investigating the cause of the differences is beyond the purpose of this p
 \item The most numerically outstanding benchmark is the execution time of the issuer's keygen script on Raspberry Pi 0, when compared with the other platform. Once more, investigating the reason for this discrepancy is beyond the scope of this paper: we speculate ECP2 pairing performed in script may justify it.
 \end{itemize}
 
+\subsection*{Benchmark conclusions} 
+
+The ultimate goal of this benchmarks is to assess what parts of cryptographic flow are suitable for execution on each platform. The limits regard both the execution time as well as the RAM usage. Concerning the \textbf{RAM usage}, the highest value recorded is in the 5 megabytes range, which we consider to be well within the acceptable range for any of the platforms used in the benchmarks. Future analysis will investigate the possibility to execute the less resource intense parts of the flow on ultra low power chips such as the \textbf{Cortex M4}, for which a port of Zenroom is available.
+
+Concerning the \textbf{execution time}, if we use 1 second as  arbitrary limit, for longest execution time acceptable for any part of the flow, we find that: 
+
+\begin{itemize}
+\item Every script of the groups (P) and (I) have acceptable performances on any platform when using Zenroom compiled as CLI. 
+
+\item With a few exceptions, we find a similar result when running scripts of the  (P) and (I) groups, for Zenroom compiled in WASM. With this setup, only three scripts run over the 1 second limit, only on Raspberry Pi 0.
+ 
+\item The scripts in the group (A), when using Zenroom CLI, can be executed within one second for between 100 and 500 participants on the X86 machine and for a similar amount on a Raspberry Pi 4, while on a Raspberry Pi 0 the limit is between 10 and 50 participants. 
+
+\item The scripts in the group (A), when using Zenroom WASM, can be executed within one second for between 100 and 500 participants on the X86 machine and up to 100 on a Raspberry Pi 4, while on a Raspberry Pi 0 the limit is between 2 and 5 participants. 
+
+\end{itemize}
+
+
 
 % All results are produced using the free and open source \emph{AGPLv3 license} Zenroom VM long term support release \emph{version 1.2} and its built-in credentials and multidarkroom scenarios using the zencode scripts released in the zencode_multidarkroom distributed examples.
 
