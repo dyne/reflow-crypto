@@ -378,8 +378,10 @@ most important technical necessities for such an application are the
 confidentiality issues regarding access to information and the
 guarantees of the quality of information \citep{resources-passport}.
 
-As an ideally simple and effective ontology we adopt ValueFlows to organize
-knowledge in a graph made of 4 main type of nodes:
+As an ideally simple and effective ontology we adopt a
+Resource-Event-Agent model \citep{REA} and the ValueFlows vocabulary
+\citep{valueflows} to organize knowledge in a graph made of 4 main
+type of nodes:
 
 \begin{enumerate}
   \item Events that are the means of creation and transformation of Resources
@@ -882,23 +884,145 @@ This code is executed in multiple steps by the Zencode utterances:
 \end{enumerate}
 
 \subsection{Signature}
-At this point the 
-
-\textbf{Sign:}
 
 \begin{figure}
   \caption{Signing process sequence diagram}
+  \label{fig:signature_diagram}
   \centering
-  \includegraphics[width=0.4\textwidth]{sign-seq}
+  \includegraphics[width=0.5\textwidth]{sign-seq}
 \end{figure}
 
-\textbf{Verify:}
+The Reflow signature consists into a multi-signature that can be
+indicted by anyone who selects multiple participants. It requires no
+interaction between participants and it results into what we call a
+\emph{Seal} collecting all the signatures, as illustrated in figure
+\ref{fig:signature_diagram}.
 
-\begin{figure}
-  \caption{Verification process sequence diagram}
-  \centering
-  \includegraphics[width=0.4\textwidth]{verify-seq}
-\end{figure}
+Both the credential to sign and the signatures in the reflow seal are
+non traceable. The credentials are zero-knowledge proof of possessions
+bound to the seal identifier; the public keys of participants are
+blinded and known only by the one who indicts the signature, who may
+or may not be among participants.
+
+The signatures are non-interactive and made in a multi-party
+computation setup: any participant with a credential to sign can do so
+without interacting with others, just by adding the reflow signature
+to the reflow seal.
+
+Every signature in a seal produces a \emph{fingerprint} unique to the
+seal and the signer consisting in a $\zeta$ that is also non
+traceable. Using fingerprints a check may be enforced to avoid double
+signing and invalidate the reflow seal.
+
+\paragraph{When a seal is created} a session is opened for multiple
+participants to add their signature, anyone opening such a process
+needs to have an \emph{array of public keys} of all desired
+participants.
+
+\begin{lstlisting}[style=zencode,caption={Create reflow seal}]
+Scenario reflow: create a new signing session (seal)
+Given I have a 'reflow public key array' named 'public keys'
+and I have a 'string dictionary' named 'Event'
+When I aggregate the reflow public key from array 'public keys'
+and I create the reflow identity of 'Event'
+and I create the reflow seal with identity 'reflow identity'
+Then print the 'reflow seal'
+\end{lstlisting}
+
+\paragraph{When a seal is signed} there are two different steps to be
+performed: one by the participant publishing the signature and one by
+anyone aggregating the signature to the seal. This is necessary since
+we are in a multi-party computation session where each step forward in
+the process can be performed independently and without requiring
+anyone to disclose any secret.
+
+\begin{lstlisting}[style=zencode,caption={Create a reflow signature}]
+Scenario reflow: participant signs a seal by producing a signature
+Given I am 'Alice'
+and I have the 'credentials'
+and I have the 'keys'
+and I have a 'reflow seal'
+and I have a 'issuer public key' from 'The Issuer'
+When I create the reflow signature
+Then print the 'reflow signature'
+\end{lstlisting}
+
+\begin{lstlisting}[style=zencode,caption={Add a signature to a seal}]
+Scenario reflow
+Given I have a 'reflow seal'
+and I have a 'issuer public key' in 'The Authority'
+and I have a 'reflow signature'
+When I aggregate all the issuer public keys
+and I verify the reflow signature credential
+and I check the reflow signature fingerprint is new
+and I add the reflow fingerprint to the reflow seal
+and I add the reflow signature to the reflow seal
+Then print the 'reflow seal'
+\end{lstlisting}
+
+The session may be considered terminated at any moment by anyone: the
+seal can be validated in any moment as-is and it will simply return
+false validation if signatures are wrong or incomplete.
+
+\begin{lstlisting}[style=zencode,caption={Compare reflow identities}]
+Scenario reflow: compare two different objects using reflow IDs
+Given I have a 'reflow seal'
+Given I have a 'string dictionary' named Event
+When I create the reflow identity of 'Event'
+When I rename the 'reflow identity' to 'EventIdentity'
+When I verify 'EventIdentity' is equal to 'identity' in 'reflow seal'
+Then print the string 'The seal really belongs to this Event'
+\end{lstlisting}
+
+
+\begin{lstlisting}[style=zencode,caption={Verify a seal}]
+Scenario reflow: verify a seal contains all valid signatures
+Given I have a 'reflow seal'
+When I verify the reflow seal is valid
+Then print the string 'SUCCESS'
+and print the 'reflow seal'
+\end{lstlisting}
+
+At this point the seal may be marked as closed as the session is
+completed succesfully and all correct signatures have been collected
+without duplicates. In case this optional status will be attributed to
+the seal then is also possible to remove the \emph{fingerprints}
+array from it by reducing its size.
+
+
+
+\subsection{Material Passport}
+
+The Reflow material passport consists in a REA model track-and-trace
+\citep{trackandtrace} listing. It aggregates Reflow seals by means of
+collecting their signed \verb!UID! (unique identifier). The list of
+fingerprints in a material passport is not to be confused with that of
+a seal: it is the list of all \verb!UID! being traced in one seal,
+which adds its own \verb!UID! resulting from the hash to point of the
+new message.
+
+The complexity of this implementation requires the adoption of a small
+ontology, the Valueflows vocabulary \citep{valueflows}, that briefly
+distinguishes between roles of the nodes represented and organizes
+their interaction.
+
+A seal may still be signed by one or more participants which are the
+\emph{Agents} in the Valueflows REA model. Agents may be signing a new
+\emph{Event} or \emph{Process} alone or toghether with more agents.
+All signatures will still be blinded and non-traceable to satisfy
+Reflow's privacy requirements, while the \verb!UID! composing the
+material passport may be listed in a fingerprint section to
+authenticate the track-and-trace graph and perform deeper verification
+of all nodes.
+
+As hinted by the optional presence of fingerprint lists, as well
+optional record of the agent's credential \emph{Proof} inside the
+material passport, this implementation is extremely flexible and opens
+up a range of possible solutions in the field of privacy-enhanced
+graph authentication, allowing import and export operations between
+federated graph data bases, also considering each data silo may be an
+\emph{Issuer} publicly identified and granting agent credentials.
+
 
 
 
