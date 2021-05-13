@@ -24,8 +24,8 @@
 \pdfoutput=1
 
 % Roman numbers for sections
-\renewcommand{\thesection}{\Roman{section}} 
-\renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+% \renewcommand{\thesection}{\Roman{section}} 
+% \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
 
 \usepackage{arxiv}
 
@@ -116,17 +116,14 @@
 \author{
     Denis Roio \\
 	Dyne.org foundation \\
-	Amsterdam, 1013AK \\
 	\texttt{J@Dyne.org} \\
     \And
 	Alberto Ibrisevic \\
-	Laboratory of Cryptography\\
-	Trento University (stage)\\
+	Dyne.org foundation\\
 	\texttt{Bettowski@dyne.org} \\
     \And
     Andrea D'Intino \\
     Dyne.org foundation \\
-    Amsterdam, 1013AK \\
     \texttt{Andrea@Dyne.org} \\
 }
 
@@ -142,7 +139,8 @@
   pdftitle={Reflow multi-party signatures - Secure BLS multi-signatures Zero-knowledge proof },
   pdfsubject={cs.CR},
   pdfauthor={Denis Roio, Alberto Ibrisevic, Andrea D'Intino},
-  pdfkeywords={Cryptography, signatures, zero-knowledge, multi-party, authentication, REA},
+  pdfkeywords={crypto, sign, zero-knowledge, multi-party,
+    material passport, authentication, valueflows, resource event agent},
 }
 
 \begin{document}
@@ -883,20 +881,24 @@ This code is executed in multiple steps by the Zencode utterances:
  authenticate the Reflow signature against rogue-key attacks.
 \end{enumerate}
 
+\onecolumn
+
 \subsection{Signature}
 
-\begin{figure}
-  \caption{Signing process sequence diagram}
-  \label{fig:signature_diagram}
-  \centering
-  \includegraphics[width=0.5\textwidth]{sign-seq}
-\end{figure}
+% \begin{figure}
+%   \caption{Signing process sequence diagram}
+%   \label{fig:signature_diagram}
+%   \centering
+%   \includegraphics[width=0.5\textwidth]{sign-seq}
+% \end{figure}
 
 The Reflow signature consists into a multi-signature that can be
 indicted by anyone who selects multiple participants. It requires no
 interaction between participants and it results into what we call a
-\emph{Seal} collecting all the signatures, as illustrated in figure
-\ref{fig:signature_diagram}.
+\emph{Seal} collecting all the signatures.
+
+% , as illustrated in figure
+% \ref{fig:signature_diagram}.
 
 Both the credential to sign and the signatures in the reflow seal are
 non traceable. The credentials are zero-knowledge proof of possessions
@@ -1015,7 +1017,50 @@ material passport may be listed in a fingerprint section to
 authenticate the track-and-trace graph and perform deeper verification
 of all nodes.
 
-As hinted by the optional presence of fingerprint lists, as well
+\begin{lstlisting}[style=zencode,caption={Create a new material passport}]
+Scenario reflow
+Given I am 'Alice'
+and I have the 'keys'
+and I have the 'credentials'
+and I have a 'issuer public key' in 'The Authority'
+and I have a 'reflow identity'
+and I have a 'string dictionary' named 'EconomicEvent'
+When I create the material passport of 'EconomicEvent'
+Then print the 'EconomicEvent'
+and print the 'material passport'
+\end{lstlisting}
+
+What follows is the representation of the output, which shows how a
+material passport is formatted, keeping the same variable names used
+in the mathematical formulas and indicating the type of members ("ecp"
+stands for elliptic curve point and a 2 is added to indicate those on a twisted curve) and their size in bytes.
+
+\begin{lstlisting}[caption={Example material passport data}]
+material_passport = {
+    proof = {
+        kappa = ecp2[192] ,
+        nu = ecp[49] ,
+        pi_v = {
+            c = int[32] ,
+            rm = int[32] ,
+            rr = int[32] 
+        },
+        sigma_prime = {
+            h_prime = ecp[49] ,
+            s_prime = ecp[49] 
+        }
+    },
+    seal = {
+        SM = ecp[49] ,
+        fingerprints = [1] <table 1>,
+        identity = ecp[49] ,
+        verifier = ecp2[192] 
+    },
+    zeta = ecp[49] 
+}
+\end{lstlisting}
+
+As hinted by the optional presence of a list of fingerprints, as well
 optional record of the agent's credential \emph{Proof} inside the
 material passport, this implementation is extremely flexible and opens
 up a range of possible solutions in the field of privacy-enhanced
@@ -1023,33 +1068,51 @@ graph authentication, allowing import and export operations between
 federated graph data bases, also considering each data silo may be an
 \emph{Issuer} publicly identified and granting agent credentials.
 
+The verification of a material passport implicitly verifies that the
+the hash to point of the objects's contents result in the same
+\emph{reflow identity}, then executes a cryptographic verification
+that the given material passport is the valid signature of that
+identity:
+
+\begin{lstlisting}[style=zencode,caption={Verify a material passport}]
+Scenario reflow
+Given I have a 'string dictionary' named 'EconomicEvent'
+and I have a 'issuer public key' in 'The Authority'
+and I have a 'material passport'
+When I verify the material passport of 'EconomicEvent'
+Then print the string 'Valid Event material passport'
+\end{lstlisting}
+
+To avoid confusion is important to keep in mind that identities are
+\verb!UID!s and fingerprints are \verb!zeta!s.
+
+The simple signature and verification of a single object is not enough
+to implement a material passport, we need to authenticate the
+\emph{track and trace} of it eventually validating all the complex
+history of transformations that lead to the current object. In order
+to do so our implementation exploits the aggregation property of
+elliptic curve points by making a sum of all object identities present
+in the track and trace. Following the Valueflows logic then, every
+Event or Process identity will result from the sum of all identities
+of previous Agents, Events and Processes. By recalculating this sum
+and checking its signature then one can authenticate the integrity of
+the track and trace.
+
+For example, assuming we have an array of \verb!seal! objects found in
+material passports of a track and trace result, then we can calculate
+a new identity using aggregation (sum value) with Zencode statements:
 
 
+\begin{lstlisting}[style=zencode,caption={Aggregate reflow seal identity}]
+Given I have a 'reflow seal array' named 'Seals'
+When I create the sum value 'identity' for dictionaries in 'Seals'
+Then print the 'sum value'
+\end{lstlisting}
 
+Which will output an elliptic curve point corresponding to the sum of
+all identity elements found in the "Seals" array.
 
-\section{Evaluation}
-\label{sec:evaluation}
-
-This section lists results of evaluation benchmarks we have run using the Zencode scenario implementation of Reflow on 4 target platforms:
-\begin{itemize}
-  \item \textbf{X86 64bit} on a Intel i5 4th generation
-  \item \textbf{ARM 64bit} on a Raspberry Pi 4 board
-  \item \textbf{ARM 32bit} on a Raspberry Pi 0 board
-  \item \textbf{WASM 32bit} on a build made with Emscripten
-\end{itemize}
-
-Our benchmarks provide lab measurements for the 3 main steps in the signature flow: for each of them is reported the time of execution (expressed in milliseconds) and the size of output (expressed in bytes) in different conditions with a progressive number $\sigma_N$ of participants (5, 10, 50, 100 signatures).
-
-% All results are produced using the free and open source \emph{AGPLv3 license} Zenroom VM long term support release \emph{version 1.2} and its built-in credentials and Reflow scenarios using the zencode scripts released in the zencode_reflow distributed examples.
-
-% size progression: 5,10,50,100 participants:
-% byte size & 444 & 603 & 624  \\
-% byte size & 444 & 1171 & 1192  \\
-% byte size & 444 & 4011 & 4032  \\
-% byte size & 444 & 7561 & 7582  \\
-
-
-INIZIO ANDREA
+\twocolumn
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -1507,13 +1570,71 @@ Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
   \end{center}
 \end{table}
 
-\newpage
-
 \twocolumn
 
 \section{Conclusion}
 
+This article and the referenced free and open source implementation
+made in Zencode succesfully provides an easy, flexible and well
+performant way to realize anonymous signatures made by zero-knowledge
+proof credential holders and aggregated in multi-party computation
+decentralized environments.
 
+The privacy-preserving features of Reflow signatures are protected
+from rogue-key attacks by enforcing credential issuance, at the price
+of requiring one or multiple authorities. From this approach it comes
+the feature of generating signature "fingerprints" that are contextual
+and become traceable only with the consensus of participants (for
+instance by replicating the signature). These fingerprints are also
+useful to avoid double-signing and to strengthen the track-and-trace
+features of the most advanced material passport use-case scenario.
+
+The use-cases we observed haven't required the adoption of multiple
+authorities, however it is possible to enhance our scheme by porting a
+threshold credential issuance mechanism based on Lagrange
+interpolation as described in Coconut's paper \citep{coconut-2018}.
+
+Generally speaking the Reflow crypto system can be adapted to
+authenticate many sorts of graph data sets; this aspect goes well
+beyond the state of the art and its application may comes useful to an
+upcoming generation of non-linear distributed ledger technologies.
+
+\subsection{Future directions}
+
+This crypto scheme is named after the Reflow project and currently
+follows its path to serve the use-case of circular economy projects
+for which the integrity of accounting, the portability of data and the
+privacy of users are of paramount importance. We are proud of the
+priority this cryptography research gives to use-cases dealing with
+environmental responsibility and will carry on this ethos through its
+future developments.
+
+Standardisation is an important point in order to establish federated
+and decentralised use of Reflow across a variety of contexts, so we
+have high incentives in integrating this signature in W3C standards.
+
+As hinted in the overview, the discourse around disposable identities
+is also very interesting and deserves further interaction as it may
+open up more privacy preserving possibilities of development in the
+field of health-care and transportation as well public services and
+accounting traceability for KYC/AML practices.
+
+The possibility to aggregate Reflow signatures may also be exploited
+to serve need-to-know schemes where different actors may be required
+to sign different parts of a document without knowing the whole until
+its final publication, a scenario present in peer-review processes
+that may improve their impartiality.
+
+The development of next-generation DLT applications as holochain is
+also very interesting as it does implement the Valueflow REA approach
+and provides a platform where to further distribute the graph data
+beyond the federated server provision currently implemented.
+
+\subsection{Acknowledgments}
+
+The development and demonstration of the Reflow signature scheme and
+the material passport has been partially funded by the European
+project "REFLOW" funded through H2020-EU.3.5.4 with grant nr.820937.
 
 \bibliographystyle{unsrtnat}
 
