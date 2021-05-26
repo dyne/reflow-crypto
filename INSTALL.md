@@ -8,10 +8,14 @@ It is based on the [**nips_2018.sty**](https://media.nips.cc/Conferences/NIPS201
 
 On a Devuan 3.1 Beowulf:
 
-- texlive-extra-utils
-- texlive-fonts-extra
-- texlive-latex-extra
-- texlive-generic-extra
+```
+apt-get install texlive-extra-utils texlive-fonts-extra texlive-latex-extra texlive-generic-extra
+```
+
+On Ubuntu:
+```
+apt-get install texlive-font-utils texlive-extra-utils texlive-fonts-extra texlive-latex-extra
+```
 
 Docker is needed for mermaidjs rendering to file.
 
