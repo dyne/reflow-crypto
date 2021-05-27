@@ -199,13 +199,10 @@ aggregation. While being signed, duplicates may be avoided by collecting
 unlinkable fingerprints of signing parties, as they would invalidate the
 final result. Before being able to sign, a one-time setup phase is
 required where the signing party collects and aggregates a signed
-credential from one or more authorities. The attribute showing and
-verification are $O(1)$ in terms of both cryptographic computations and
-communication of cryptographic material, irrespective of the number of
-authorities \citep{coconut-2018}.
+credential from one or more authorities.
 
-Our evaluation of the Multiparty primitives shows very promising
-results. Session creation takes about $20ms$, while signing $73ms$ and
+Our evaluation of the Reflow functions shows very promising
+results: basic session creation takes about $20ms$, while signing $73ms$ and
 verification $40ms$ on average consumer hardware.
 
 \subsection*{Overview}
@@ -240,8 +237,8 @@ Following this setup any participant will be able to produce a
 zero-knowledge proof of possession of the credential, which can be
 verified by anyone anonymously on the blockchain.
 
-The base application of Multidarkdroom is obviously the collective
-signature of digital documents and the signed credential proof will be a
+The base application of Reflow is the privacy preserving collective
+signature of digital documents for which the signed credential proof is a
 requirement to participate to any signature process.
 
 A Reflow signature process is best described in 3 main steps:
@@ -249,7 +246,7 @@ session creation, signature and verification.
 
 \paragraph*{1. Anyone creates a session}
 
-A session may be created by anyone, no credentials are required, but only information that should be public: the public keys of participants holding a credential to sign, the public verifier of the issuer who has signed the credentials and at last a document to be signed. The steps below are represented in figure \ref{fig:create_session} and illustrate how a signature session is created: 
+A session may be created by anyone, no credentials are required, but only information that should be public: the public keys of participants holding a credential to sign, the public verifier (public signature key) of the issuer who has signed the credentials and at last a document to be signed. The steps below are represented in figure \ref{fig:create_session} and illustrate how a signature session is created: 
 
 \begin{enumerate}
   \item Participants will publish their public keys, available to anyone 
