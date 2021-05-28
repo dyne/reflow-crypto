@@ -1116,7 +1116,7 @@ all identity elements found in the "Seals" array.
 
 
 
-The goal of this section was to produce benchmarks of the implementation of the crypto flow, in  realistic conditions of use, so in a way that is similar to how a software solution would use the software. 
+The goal of this section was to produce benchmarks of the implementation of the cryptographic flow, in  realistic conditions of use, so in a way that is similar to how a software solution would use the software. 
 
 Our approach was opposite to testing single algorithms in a sandbox or a profiler, instead we tested Zenroom scripts, written in Zencode, that include also loading and parsing input data from streams or file system, as well as producing output as a deterministically formed JSON object. 
 
@@ -1124,8 +1124,8 @@ Our approach was opposite to testing single algorithms in a sandbox or a profile
 The three target platforms used for the benchmarks were: 
 \begin{itemize}
   \item   \textbf{X86-64} on Intel(R) Core(TM) i5-5300U CPU @ 2.30GHz, running Ubuntu 18.04 (64 bit)
-  \item   \textbf{ARM 32bit} on Raspberry Pi 4 board, running Raspberry Pi OS (32bit, kernel version: 5.10)
-  \item  \textbf{ARM 32bit} on Raspberry Pi 0 board, running Raspberry Pi OS (32bit, kernel version: 5.10)
+  \item   \textbf{ARM 32bit} on \textbf{Raspberry Pi 4} board, running Raspberry Pi OS (32bit, kernel version: 5.10)
+  \item  \textbf{ARM 32bit} on \textbf{Raspberry Pi 0} board, running Raspberry Pi OS (32bit, kernel version: 5.10)
 \end{itemize}
 
 The the X86-64 machine runs on a Lenovo X250 laptop, with 8GB of RAM.  
@@ -1133,48 +1133,48 @@ The Raspberry 0 and 4 have been chosen as benchmarking platforms because of thei
 
 \subsection*{Builds} 
 
-Being a self-contained application written in C, Zenroom can be built for several CPU architectures and operative systems, both as command line interface (CLI) application and as a library. The configurations We chose for this benchmark are: 
+Being a self-contained application written in C, Zenroom can be built for several CPU architectures and operative systems, both as command line interface (CLI) application and as a library. The configurations we chose for this benchmark are: 
 
 \begin{itemize}
-\item Two binary Zenroom CLI, compiled on the GCC toolchain in native 32bit ELF binaries, once for the X86-64 platform and once for the ARMv7-32bit. We refer to these builds as \textbf{Zenroom CLI}. 
+\item Two binary Zenroom CLI, compiled using the GCC tool-chain in native 32bit ELF binaries, once for the X86-64 platform and once for the ARMv7-32bit. We refer to these builds as \textbf{Zenroom CLI}. 
 
-\item One mixed library, transcompiled to WASM using the Emscripten toolchain, then built into an NPM package along with a JavaScript wrapper. At build time, the compiled WASM is converted to base64 and embedded in the JavaScript wrapper, which unpacks it at run-time. 
+\item One mixed library, trans-compiled to WASM using the Emscripten tool-chain \citep{zakai2011emscripten}, then built into an NPM package along with a JavaScript wrapper. After trans-compilation, the WASM library is converted to base64 and embedded inside the JavaScript wrapper, which unpacks it at run-time. 
 The library runs in browsers (using the native WASM support, currently present in Chromium/Chrome, Firefox and Safari), as well in node JS based application. We refer to this build as \textbf{Zenroom WASM}. 
 \end{itemize}
 
 \subsection*{CLI and WASM use cases} 
 
-The use case the CLI application is typically a server-side application or micro-service. The WASM library can run iin the browser, as the client side of a web application, in a server-side application based on node JS or a mobile application.
+The use case for Zenroom CLI is typically a server-side application or micro-service. The WASM library can run in the browser, in the front end of a web application or in a server-side application (running on node JS) or a mobile application.
 
-Zenroom can also be built as a native library for Android and iOS (on ARM 32bit, ARM 32bit or X86), but no benchmarks of the Reflow crypto flow have been performed using Zenroom as a native library. 
-In other benchmarks, not published on this paper, we noted similar performances for the native CLI and the native library versions of Zenrooms: we therefore assume performances would be comparable between the builds we are using and the native library builds.
+Zenroom can also be built as a native library for Android and iOS (on ARM 32bit, ARM 32bit or X86), but no benchmarks of the Reflow cryptographic flow have been performed using Zenroom as a native library. 
+In previous benchmarks, we noted similar performances for the native CLI and the native library versions of Zenroom, we therefore assume that performances would be comparable between the CLI builds we are using and the native library builds.
 
 \subsection*{Testing}
-Benchmarking of Zenroom CLI and Zenroom WASM required using two different tools. Both tools performed chained execution of the Zenroom scripts and allowed for parametrized execution, where the amount of participants and the number of recursion cycles can be configured.  
+Benchmarking of Zenroom CLI and Zenroom WASM required using two different tools. Both tools performed chained execution of Zencode scripts that would simulate the whole cryptographic flow. Furthermore, the tool allowed to configure the amount of participants in the flow and the repeat the run of selected scripts in order to gather more data.  
 
 \begin{itemize}
 \item The testing of Zenroom CLI was executed using a single, self-contained \href{https://github.com/dyne/Zenroom/blob/master/test/zencode_reflow/run-recursive.sh}{bash script}. The script outputs the duration of the execution of each Zenroom scripts, along with the memory usage and size of output data, in a CSV formatted summary. The script also saves to files both the data and scripts for quality control reference.
 
-\item The testing of Zenroom WASM required building a \href{https://github.com/dyne/Reflow-Zencode-WASM-benchmark}{JavaScript application}, running in node JS. The application outputs the duration of the execution of each Zenroom scripts, along with the memory usage, it calculate averages and retursn output in a JSON formatted summary.
+\item The testing of Zenroom WASM required building a \href{https://github.com/dyne/Reflow-Zencode-WASM-benchmark}{JavaScript application}, running in node JS. The application outputs the duration of the execution of each Zenroom scripts, along with the memory usage, it calculate averages and returns output in a JSON formatted summary.
 \end{itemize}
 
-Benchmarks for the crypto flow were run on both the CLI and the WASM builds of Zenroom, for each platform, for a total of six different data collections. 
+Benchmarks for the cryptographic flow were run on both the CLI and the WASM builds of Zenroom, for each platform, for a total of six different data collections. 
 
 \subsection*{Scripts description}
 
-Our benchmarks provide measurements for the all the steps in the signature flow: for each of them is reported the time of execution (expressed in seconds) and the size of output (expressed in bytes) in different conditions with a progressive number of participants (5, 10, 50, 100, 1000 signatures).
+Our benchmarks provide measurements for the all the steps in the signature flow: for each of them we reported the time of execution (expressed in seconds) and the size of output (expressed in bytes) in different conditions with a progressive number of participants (5, 10, 50, 100, 1000 signatures).
 
-The scripts used in the flow and for bench-marking can be divided in three categories: 
+The Zencode scripts used in the flow and for bench-marking can be divided in three categories: 
 
 \begin{itemize}
-\item Scripts with \textbf{variable execution times} executed by anyone and marked with (A), include the creation of the Reflow seal (Session start), the aggregation of the signatures (Collect sign) and the verification of the signatures on Reflow seal. Their duration is proportional to the amount of participants and can vary greatly. These scripts are the most calculation intensive ones and expected to typically run server-side.
+\item Scripts with \textbf{variable execution times} executed by anyone, marked with (A): they include the creation of the Reflow seal (Session start), the aggregation of the signatures (Collect sign) and the verification of the signatures on Reflow seal. Their duration is proportional to the amount of participants and can differ greatly. These scripts are the most calculation intensive and expected to typically run server-side. The (A) stands for "Anyone" as they don't need an identity or a keypair to run. These scripts are typically expected to run server side.
 
-\item Scripts executed by each participant, marked with (P), include participant's setup and signing, they're duration is not correlated with the amount of participants. These scripts are expected to typically run in the browser or on mobile devices.
+\item Scripts executed by each participant, marked with (P): they include participant's setup and signing, their duration is not correlated with the amount of participants. These scripts are expected to typically run in the browser or on mobile devices.
 
-\item Scripts executed by the issuer, marked (I), include issuer's setup and signing, they're duration is not correlated with the amount of participants. These scripts are expected to typically run server-side.
+\item Scripts executed by the issuer, marked with (I): they include issuer's setup and signing, their duration is not correlated with the amount of participants. These scripts are expected to typically run server-side.
 \end{itemize}
 
-Each scripts was executed 50 times, on each platform and each configuration, an the average execution time was extracted.
+Each script was executed 50 times, on each platform and each configuration, and the average execution time was extracted. 
 
 
 
@@ -1183,26 +1183,26 @@ Each scripts was executed 50 times, on each platform and each configuration, an 
 \begin{itemize}
 \item The execution time of the scripts in the (A) group, grows linearly with the amount of participants. 
 
-\item On a X86-64 machine, the benchmarks execute on Zenroom CLI have a comparable duration with their counterparts run on WASM. The execution times differ otherwise greatly between Zenroom CLI and Zenroom WASM, on the ARM 32bit based Raspberry Pi 0 and 4 machines. 
-While investigating the cause of the differences is beyond the purpose of this paper, we speculate this as signaling different levels of optimization, for the of WASM interpreters built for X86-64 on one hand, and ARM 32bit on the other.  
+\item On a X86-64 machine, the benchmarks execute on Zenroom CLI have a comparable duration with their counterparts run on WASM. On the other hand, the execution times differ greatly on the ARM 32bit based Raspberry Pi 0 and 4 machine, when comparing Zenroom CLI and Zenroom WASM executions. 
+While investigating the cause of the differences is beyond the purpose of this paper, we speculate this difference signals different levels of optimization, between the of WASM interpreters built for X86-64 on one hand, and ARM 32bit on the other.  
 
-\item The most numerically outstanding benchmark is the execution time of the issuer's keygen script on Raspberry Pi 0, when compared with the other platform. Once more, investigating the reason for this discrepancy is beyond the scope of this paper: we speculate ECP2 pairing performed in script may justify it.
+\item The most numerically outstanding benchmark is the execution time of the issuer's keygen script on Raspberry Pi 0, in comparison with the other platforms. Once more, investigating the reason for this discrepancy is beyond the scope of this paper: we do anyway speculate that the ECP2 pairing performed in the script, may justify the large difference.
 \end{itemize}
 
 \subsection*{Benchmark conclusions} 
 
-The ultimate goal of this benchmarks is to assess what parts of cryptographic flow are suitable for execution on each platform. The limits regard both the execution time as well as the RAM usage. Concerning the \textbf{RAM usage}, the highest value recorded is in the 5 megabytes range, which we consider to be well within the acceptable range for any of the platforms used in the benchmarks. Future analysis will investigate the possibility to execute the less resource intense parts of the flow on ultra low power chips such as the \textbf{Cortex M4}, for which a port of Zenroom is available.
+The ultimate goal of this benchmarks is to assess what parts of cryptographic flow are suitable for execution on each platform, both in terms of execution times as well as RAM usage. Concerning the \textbf{RAM usage}, the highest value recorded is in the 5 megabytes range, which we consider to be well within the acceptable range for any of the platforms used in the benchmarks. Future analysis will investigate the possibility to execute the less resource intense parts of the flow, on ultra low power chips such as the \textbf{Cortex M4}, for which a port of Zenroom is available.
 
-Concerning the \textbf{execution time}, if we use 1 second as  arbitrary limit, for longest execution time acceptable for any part of the flow, we find that: 
+Concerning the \textbf{execution time}, if we choose that the longest execution time acceptable for any script of the flow, is up to 1 second, we find that: 
 
 \begin{itemize}
 \item Every script of the groups (P) and (I) have acceptable performances on any platform when using Zenroom compiled as CLI. 
 
 \item With a few exceptions, we find a similar result when running scripts of the  (P) and (I) groups, for Zenroom compiled in WASM. With this setup, only three scripts run over the 1 second limit, only on Raspberry Pi 0.
  
-\item The scripts in the group (A), when using Zenroom CLI, can be executed within one second for between 100 and 500 participants on the X86 machine and for a similar amount on a Raspberry Pi 4, while on a Raspberry Pi 0 the limit is between 10 and 50 participants. 
+\item The scripts in the group (A), when using Zenroom CLI, can be executed within one second for an amount of participants between 100 and 500 on the X86 machine and for a similar amount on a Raspberry Pi 4, while on a Raspberry Pi 0 the limit is between 10 and 50 participants. 
 
-\item The scripts in the group (A), when using Zenroom WASM, can be executed within one second for between 100 and 500 participants on the X86 machine and up to 100 on a Raspberry Pi 4, while on a Raspberry Pi 0 the limit is between 2 and 5 participants. 
+\item The scripts in the group (A), when using Zenroom WASM, can be executed within one second, for an amount of participants between 100 and 500 on the X86 machine and up to 100 on a Raspberry Pi 4, while on a Raspberry Pi 0 the limit is between 2 and 5 participants. 
 
 \end{itemize}
 
@@ -1520,6 +1520,8 @@ Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
 
 \subsection*{RAM usage}
 
+The benchmarking of the RAM has been performed on Zenroom CLI only. The RAM usage showed negligible differences among the X86 and the arm builds. The tables show the results of the X86 benchmarks.   
+
 \begin{table}[h!]
   \begin{center}
     \caption{Execution timings on \textbf{RAM Usage} in $KiloBytes$ per $participant$}
@@ -1572,7 +1574,7 @@ Raspberry Pi  0	&		9.958	&	1.101	&	2.6355	\\
 \section{Conclusion}
 
 This article and the referenced free and open source implementation
-made in Zencode succesfully provides an easy, flexible and well
+made in Zencode successfully provides an easy, flexible and well
 performant way to realize anonymous signatures made by zero-knowledge
 proof credential holders and aggregated in multi-party computation
 decentralized environments.
@@ -1591,14 +1593,14 @@ authorities, however it is possible to enhance our scheme by porting a
 threshold credential issuance mechanism based on Lagrange
 interpolation as described in Coconut's paper \citep{coconut-2018}.
 
-Generally speaking the Reflow crypto system can be adapted to
+Generally speaking the Reflow cryptographic system can be adapted to
 authenticate many sorts of graph data sets; this aspect goes well
 beyond the state of the art and its application may comes useful to an
 upcoming generation of non-linear distributed ledger technologies.
 
 \subsection{Future directions}
 
-This crypto scheme is named after the Reflow project and currently
+This cryptographic scheme is named after the Reflow project and currently
 follows its path to serve the use-case of circular economy projects
 for which the integrity of accounting, the portability of data and the
 privacy of users are of paramount importance. We are proud of the
