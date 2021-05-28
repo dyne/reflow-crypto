@@ -61,8 +61,8 @@
     urlcolor=cyan,
 }
 
-\usepackage{draftwatermark}
-\SetWatermarkText{Draft}
+% \usepackage{draftwatermark}
+% \SetWatermarkText{Draft}
 
 \lstdefinestyle{lua}{
   language=[5.3]Lua,
@@ -114,17 +114,14 @@
 %\date{} 					% Or removing it
 
 \author{
-    Denis Roio \\
-	Dyne.org foundation \\
-	\texttt{J@Dyne.org} \\
+  Denis Roio \\
+	Dyne.org \\
     \And
 	Alberto Ibrisevic \\
-	Dyne.org foundation\\
-	\texttt{Bettowski@dyne.org} \\
+  Dyne.org \\
     \And
-    Andrea D'Intino \\
-    Dyne.org foundation \\
-    \texttt{Andrea@Dyne.org} \\
+  Andrea D'Intino \\
+  Dyne.org
 }
 
 % Uncomment to remove the date
@@ -355,7 +352,7 @@ context by the means of context-specific signature fingerprints.
 
 This scenario is relevant for the implementation of privacy-preserving
 public sector applications that allow authentication and signatures
-through disposable identity systems.   
+through disposable identity systems \citep{dispid-kranenbu}.   
 
 
 \paragraph*{Material Passport.}
@@ -375,7 +372,7 @@ guarantees of the quality of information \citep{resources-passport}.
 
 As an ideally simple and effective ontology we adopt a
 Resource-Event-Agent model \citep{REA} and the ValueFlows vocabulary
-\citep{valueflows} to organize knowledge in a graph made of 4 main
+\citep{valueflows} to organize knowledge in a graph made of 3 main
 type of nodes:
 
 \begin{enumerate}
@@ -422,7 +419,7 @@ material passports can be signed on export and verified on import, which
 makes them reliably portable from one graph to another in a federated
 environment.
 
-\subsection*{This paper makes three key contributions}
+\subsection*{This paper makes four key contributions}
 
 \begin{itemize}
 \item We describe the signature scheme underlying Reflow, including how
@@ -441,6 +438,9 @@ environment.
   (Section \ref{sec:implementation}). We evaluate the performance and cost of
   this implementation on on-site and on-line platforms leveraging end-to-end
   encryption (Section \ref{sec:evaluation}).
+\item We implement an efficient end-to-end encryption scheme for the
+authentication of graph data structures as observed in the material
+passport use-case. The scheme allows to simplify the complexity of track-and-trace implementations by making it sufficient to proceed by one level of depth and verify the integrity of aggregated signatures at each step.
 \end{itemize}
 
 \subsection*{Notations and assumptions}
@@ -793,9 +793,9 @@ Then print my 'keys'
 
 Executed by the Zencode utterance:
 
-\textbf{When I create the issuer keypair}
+\textbf{When I create the issuer key}
 
-It will create a new \emph{issuer keypair} that can be used to sign
+It will create a new \emph{issuer key} that can be used to sign
 each new \emph{credential request}. Its public member \emph{.verify}
 should be public and know to anyone willing to verify the credentials
 of signers. It can be safely separated from the secret key and
@@ -867,7 +867,7 @@ This code is executed in multiple steps by the Zencode utterances:
   $\tilde{\sigma}$ signed used the Issuer's own secret key $sk$ after
   verifying the proof $\pi_s$ inside the received $\lambda$.
 
-\item \textbf{Given I have a 'credential signature}
+\item \textbf{Given I have a 'credential signature'}
  \\ \textbf{When I create the credentials}
 
  will be executed by the Signer to aggregate one or more
@@ -1006,7 +1006,7 @@ distinguishes between roles of the nodes represented and organizes
 their interaction.
 
 A seal may still be signed by one or more participants which are the
-\emph{Agents} in the Valueflows REA model. Agents may be signing a new
+\emph{Agents} in the ValueFlows REA model. Agents may be signing a new
 \emph{Event} or \emph{Process} alone or toghether with more agents.
 All signatures will still be blinded and non-traceable to satisfy
 Reflow's privacy requirements, while the \verb!UID! composing the
@@ -1089,16 +1089,31 @@ to implement a material passport, we need to authenticate the
 history of transformations that lead to the current object. In order
 to do so our implementation exploits the aggregation property of
 elliptic curve points by making a sum of all object identities present
-in the track and trace. Following the Valueflows logic then, every
+in the track and trace. Following the ValueFlows logic then, every
 Event or Process identity will result from the sum of all identities
 of previous Agents, Events and Processes. By recalculating this sum
 and checking its signature then one can authenticate the integrity of
 the track and trace.
 
 For example, assuming we have an array of \verb!seal! objects found in
-material passports of a track and trace result, then we can calculate
-a new identity using aggregation (sum value) with Zencode statements:
+material passports of a track and trace result of one level depth:
 
+\begin{lstlisting}[caption={Example material passport data}]
+Seals = [2] { {
+  SM = ecp[49] ,
+  fingerprints = [1] { ecp[49]  },
+  identity = ecp[49] ,
+  verifier = ecp2[192]
+}, {
+  SM = ecp[49] ,
+  fingerprints = [1] { ecp[49]  },
+  identity = ecp[49] ,
+  verifier = ecp2[192]
+} }
+\end{lstlisting}
+
+Then we can calculate a new identity using aggregation (sum value) with
+Zencode statements:
 
 \begin{lstlisting}[style=zencode,caption={Aggregate reflow seal identity}]
 Given I have a 'reflow seal array' named 'Seals'
@@ -1107,16 +1122,17 @@ Then print the 'sum value'
 \end{lstlisting}
 
 Which will output an elliptic curve point corresponding to the sum of
-all identity elements found in the "Seals" array.
+all identity elements found in the "Seals" array. The fact that the
+verification happens to a sum that cascades down aggregating further
+depth level of parent objects allows to modularize the track-and-trace
+implementation making its depth configurable.
 
 \twocolumn
 
 \section{Evaluation}
 \label{sec:evaluation}
 
-
-
-The goal of this section was to produce benchmarks of the implementation of the cryptographic flow, in  realistic conditions of use, so in a way that is similar to how a software solution would use the software. 
+The goal of this section is to produce benchmarks of the implementation of the cryptographic flow, in  realistic conditions of use, so in a way that is similar to how a software solution would use the software. 
 
 Our approach was opposite to testing single algorithms in a sandbox or a profiler, instead we tested Zenroom scripts, written in Zencode, that include also loading and parsing input data from streams or file system, as well as producing output as a deterministically formed JSON object. 
 
@@ -1609,8 +1625,9 @@ environmental responsibility and will carry on this ethos through its
 future developments.
 
 Standardisation is an important point in order to establish federated
-and decentralised use of Reflow across a variety of contexts, so we
-have high incentives in integrating this signature in W3C standards.
+and decentralised use of Reflow across a variety of contexts, so we have
+high incentives in integrating this signature in W3C standards as well
+submitting it to the attention of the Object Management Group.
 
 As hinted in the overview, the discourse around disposable identities
 is also very interesting and deserves further interaction as it may
@@ -1624,68 +1641,47 @@ to sign different parts of a document without knowing the whole until
 its final publication, a scenario present in peer-review processes
 that may improve their impartiality.
 
-The development of next-generation DLT applications as holochain is
-also very interesting as it does implement the Valueflow REA approach
-and provides a platform where to further distribute the graph data
-beyond the federated server provision currently implemented.
+Being at the core of the Reflow project development of a federated
+database of information that serves the piloted circular-economy
+use-cases, the main deployement of the Reflow crypto model is inside the
+Zenpub software component and will refine its interaction to GUI and
+dashboard components through a GraphQL interface and ActivityPub event
+protocol, as well leveraging the federating capabilities of this scheme
+to a stable and replicable implementation.
+
+The developments of next-generation DLT applications as Holochain
+\citep{holochain} and Hashgraph \citep{hashgraph} are also very
+interesting, in particular Holochain is known have the ValueFlows REA
+approach in course of implementation and may soon provide a platform
+where to further distribute the graph data beyond the federated server
+provision currently implemented in ZenPub.
 
 \subsection{Acknowledgments}
 
-The development and demonstration of the Reflow signature scheme and
-the material passport has been partially funded by the European
-project "REFLOW" funded through H2020-EU.3.5.4 with grant nr.820937.
+The development and demonstration of the Reflow signature scheme and the
+material passport has been partially funded by the European project
+"REFLOW" referenced as H2020-EU.3.5.4 with grant nr.820937; the
+multi-party signature implementation has been partially funded by Riddle
+\& Code GmbH as private commission.
+
+We are grateful to all our colleagues at Dyne.org for the help and
+insights they have shared contributing to this work and in particular to
+Puria Nafisi Azizi, Danilo Spinella, Adam Burns and Ivan Minutillo; as
+well to Thomas Fuerstner for sharing his visions and passion for crypto
+development with us; and to prof. Massimiliano Sala and Giancarlo
+Rinaldo for facilitating Alberto's stage program with the dept. of
+Mathematics at University of Trento. Our gratitude goes also to our
+former colleagues in the DECODE project George Danezis and Alberto
+Sonnino for creating Coconut, a wonderful crypto scheme on which Reflow
+is grafted. Last not least we are grateful to all the REFLOW project
+consortium represented by prof. Cristiana Parisi as principal
+investigator.
 
 \bibliographystyle{unsrtnat}
 
 \bibliography{references}
 
 \listoffigures
-
-% \subsection{}
-% Citations use \verb+natbib+. The documentation may be found at
-% \begin{center}
-% 	\url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-% \end{center}
-
-% Here is an example usage of the two main commands (\verb+citet+ and \verb+citep+): Some people thought a thing \citep{kour2014real, hadash2018estimate} but other people thought something else \citep{kour2014fast}. Many people have speculated that if we knew exactly why \citet{kour2014fast} thought this\dots
-
-% \subsection{Figures}
-% \lipsum[10]
-% See Figure \ref{fig:fig1}. Here is how you add footnotes. \footnote{Sample of the first footnote.}
-% \lipsum[11]
-
-% \begin{figure}
-% 	\centering
-% 	\fbox{\rule[-.5cm]{4cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-% 	\caption{Sample figure caption.}
-% 	\label{fig:fig1}
-% \end{figure}
-
-% \subsection{Tables}
-% See awesome Table~\ref{tab:table}.
-
-% The documentation for \verb+booktabs+ (`Publication quality tables in LaTeX') is available from:
-% \begin{center}
-% 	\url{https://www.ctan.org/pkg/booktabs}
-% \end{center}
-
-
-% \begin{table}
-% 	\caption{Sample table title}
-% 	\centering
-% 	\begin{tabular}{lll}
-% 		\toprule
-% 		\multicolumn{2}{c}{Part}                   \\
-% 		\cmidrule(r){1-2}
-% 		Name     & Description     & Size ($\mu$m) \\
-% 		\midrule
-% 		Dendrite & Input terminal  & $\sim$100     \\
-% 		Axon     & Output terminal & $\sim$10      \\
-% 		Soma     & Cell body       & up to $10^6$  \\
-% 		\bottomrule
-% 	\end{tabular}
-% 	\label{tab:table}
-% \end{table}
 
 
 
