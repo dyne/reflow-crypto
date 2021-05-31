@@ -1,24 +1,4 @@
-% /*
-%  * This file is part of Reflow
-%  * 
-%  * Copyright (C) 2021 Dyne.org foundation
-%  * designed, written and maintained by Denis Roio <jaromil@dyne.org>
-%  * 
-%  * This program is free software: you can redistribute it and/or modify
-%  * it under the terms of the GNU Affero General Public License v3.0
-%  * 
-%  * This program is distributed in the hope that it will be useful,
-%  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-%  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-%  * GNU Affero General Public License for more details.
-%  * 
-%  * Along with this program you should have received a copy of the
-%  * GNU Affero General Public License v3.0
-%  * If not, see http://www.gnu.org/licenses/agpl.txt
-%  * 
-%  * Last modified by Denis Roio
-%  * on Sunday, 14th March 2021 10:34:16 am
-%  */
+%  * Copyright (C) 2020-2021 Dyne.org foundation
 
 \documentclass[twocolumn]{article}
 \pdfoutput=1
@@ -44,7 +24,7 @@
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
 \usepackage{lipsum}		% Can be removed after putting your text content
-\usepackage{graphicx}
+\usepackage{graphicx,epstopdf}
 \usepackage{natbib}
 \usepackage{doi}
 \usepackage{inconsolata}
@@ -148,16 +128,7 @@
 \maketitle
 
 \begin{abstract}
-Reflow is a novel signature scheme supporting unlinkable
-signatures by multiple parties authenticated by means of a
-zero-knowledge credential scheme. Reflow integrates with
-blockchains to ensure confidentiality, authenticity and availability
-even when credential issuing authorities are offline. We implement and
-evaluate a Reflow smart contract for Zenroom and present an
-application related to multiple anonymous signatures by authenticated
-parties and their non-interactive verification. Reflow uses short
-and computationally efficient authentication credentials and signatures
-application scale linearly over multiple participants.
+Reflow is a novel signature scheme supporting unlinkable signatures by multiple parties authenticated by means of zero-knowledge credentials. Reflow integrates with blockchains and graph databases to ensure confidentiality and authenticity of signatures made by disposable identities that can be verified even when credential issuing authorities are offline.  We implement and evaluate Reflow smart contracts for Zenroom and present an application to produce authenticated material passports for resource-event-agent accounting systems based on graph data structures. Reflow uses short and computationally efficient authentication credentials and can easily scale signatures to include thousands of participants.
 \end{abstract}
 
 \vspace{2cm}
@@ -206,6 +177,13 @@ verification $40ms$ on average consumer hardware.
 
 Reflow provides a production-ready implementation that is easy to embed in end-to-end encryption applications. By making it possible for multiple parties to anonymously authenticate and produce untraceable signatures, its goal is to leverage privacy-by-design scenarios that minimize the information exchange needed for document authentication.
 
+\begin{figure}
+  \caption{Basic credential authentication }
+  \label{fig:credential_diagram}
+  \centering
+  \includegraphics[width=0.5\textwidth]{credential_diagram.eps}
+\end{figure}
+
 The participation to a signature will be governed by one or more issuers holding keys for the one-time setup of signature credentials. The steps outlined below are represented in figure \ref{fig:credential_diagram}:
 
 \begin{enumerate} % [label=\large\protect\textcircled{\small\arabic*}]
@@ -221,13 +199,6 @@ The participation to a signature will be governed by one or more issuers holding
 %   \item[\circled{3}] Participant stores the credential in its keyring
 % \end{itemize}
 
-
-\begin{figure}
-  \caption{Basic credential authentication }
-  \label{fig:credential_diagram}
-  \centering
-  \includegraphics[width=0.5\textwidth]{credential_diagram.eps}
-\end{figure}
 
 
 Following this setup any participant will be able to produce a

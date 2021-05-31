@@ -15,7 +15,13 @@ mermaid:
 	$(call mermaid,verify.mmd,verify-seq.png)
 
 clean:
-	rm -f *blg *bbl *dvi *pdf *toc *out *aux *log *lof 
+	rm -f *blg *dvi *pdf *toc *out *aux *log *lof
 
 clean-all:
 	rm -f *blg *bbl *dvi *pdf *toc *out *aux *log *lof *-seq.png *.zen *.json
+
+arxiv:
+	epstopdf create_session.eps
+	epstopdf credential_diagram.eps
+	epstopdf valueflows.eps
+	epstopdf verify_sign.eps
