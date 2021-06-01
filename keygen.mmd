@@ -1,8 +1,0 @@
-sequenceDiagram
-  participant A as Alice
-  participant I as Issuer
-  A->>A: Reflow key generation (1)
-  A->>+I: Credential signature request (2)
-  I-->A: Challenge (side channel)
-  I->>-A: Reply with signed credential (3)
-  A->>A: Safe storage of signed credential (4)
