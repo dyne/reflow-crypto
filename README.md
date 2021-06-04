@@ -1,85 +1,54 @@
-# BLS Multi-sig with zero-knowleddge proof-of-possession
+# Reflow 
 
-This crypto scheme consists into a signature process in multi-party computation where each party does not need to disclose its secret signing key to anyone else.
+[Reflow](https://reflowproject.eu) is an EU Horizon 2020 research project running from 2019-2022, which aims to enable the transition 
+of European cities towards circular and regenerative practices. More specifically, REFLOW uses Fab Labs 
+and makerspaces as catalysers of a systemic change in urban and peri-urban environments, which enable, 
+visualize and regulate “four freedoms”: free movement of materials, people, (technological) knowledge and 
+commons, in order to reduce materials consumption, maximize multifunctional use of (public) spaces and 
+envisage regenerative practices. The project will provide best practices aligning market and government needs 
+in order to create favourable conditions for the public and private sector to adopt circular economy (CE) 
+practices. REFLOW is creating new CE business models within six pilot cities: Amsterdam, Berlin, ClujNapoca, Milan, Paris and Vejle and assess their social, environmental and economic impact, by enabling active 
+citizen involvement and systemic change to re-think the current approach to material flows in cities.
 
-The BLS scheme is used as accumulator for both signatures and public keys.
+Reflow crypto and the free and open source software referenced sits at the core of the innovative developments 
+in REFLOW technical work-package and implements a novel signature scheme for the specific use-case of 
+material passports whose integrity, provenance and portability is granted by means of provable cryptography.
 
-The ZL scheme is added to protect against rogue-signature attacks
+## Zero Knowledge Multi Party Signatures with Application to Distributed Authentication
 
-References:
+Reflow crypto is a novel signature scheme supporting unlinkable signatures by multiple parties authenticated by means of zero-knowledge credentials. Reflow integrates with blockchains and graph databases to ensure confidentiality and authenticity of signatures made by disposable identities that can be verified even when credential issuing authorities are offline. We implement and evaluate Reflow smart contracts for Zenroom and present an application to produce authenticated material passports for resource-event-agent accounting systems based on graph data structures. Reflow uses short and computationally efficient authentication credentials and can easily scale signatures to include thousands of participants.
 
-- Coconut https://arxiv.org/pdf/1802.07344.pdf
-- BLS https://tools.ietf.org/html/draft-irtf-cfrg-bls-signature-02
-- BLS https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html
+This blog post provides a simple explanation: [material passports for the circular economy](https://medium.com/think-do-tank/reflow-crypto-material-passports-for-the-circular-economy-d75b3aa63678).
 
-## Quick start
+# Paper
 
-1. Clone this repository
+The pre-print of this paper is made available at:
 
-2. Run `sudo make install` to download latest zenroom and install dependencies
+- Github: [REFLOW_crypto_DYNE_D23.pdf](https://dyne.github.io/reflow-crypto/REFLOW_crypto_DYNE_D23.pdf)
+- Arxiv: https://arxiv.org/abs/2105.14527
+- NASA ADS: https://ui.adsabs.harvard.edu/abs/arXiv:2105.14527
 
-3. Run `make check` to run reflow tests
+# Citation
 
+This paper can be cited using bibtex format information:
 
-## Keygen and credential signature
-
-Alice as a participant contacts the Issuer to verify its possession of a secret key.
-
-Upon succesful verification, the Issuer will emit a credential for zero-knowledge proofs.
-
-```mermaid
-sequenceDiagram
-  participant A as Alice
-  participant I as Issuer
-  participant P as Public
-  I->>P: Issuer verifier (V)
-  A->>A: sk, pk = keygen(), cred = credgen()
-  A->>I: verification request: pk, cred
-  I->>A: challenge = crypt(pk, message)
-  A->>I: message = decrypt(sk, challenge)
-  I->>A: vcred = sign(cred) - proof of possession
-  I->>P: pk
+```
+@article{roio2021reflow,
+      title={Reflow: Zero Knowledge Multi Party Signatures with Application to Distributed Authentication}, 
+      author={Denis Roio and Alberto Ibrisevic and Andrea D'Intino},
+      year={2021},
+      eprint={2105.14527},
+      archivePrefix={arXiv},
+      primaryClass={cs.CR}
+}
 ```
 
-Any participant is supposed go through setup to obtain proof-of-possession, this is a necessary measure against rogue-signature attacks and is the only centralized process in this scheme.
+# License
 
-## Multiple signature
+Reflow crypto is copyright (C) 2020-2021 by the Dyne.org foundation
 
-Alice and Bob have both signing keys (`sk`) and signed credentials (`vcred`), now they want to sign together a document (`doc`) without disclosing any secret to each other and without intermediaries.
+The format of this document is that of an academic publication (Computer Science – Cryptography and 
+Security, cs.CR) submitted to open publishing platforms and made freely available to the scientific 
+community under the Creative Commons License (CC BY-NC-SA 4.0), see:
 
-The Public space (a DLT) can prove the authenticity of signatures submitted by checking the proof against the Issuer verifier ( `V` ).
-
-```mermaid
-sequenceDiagram
-    participant A as Alice
-    participant P as Public
-    participant B as Bob
-    A->>A: Σ = sign(sk, doc), π = makeproof(vcred)
-    A->>P: doc-id, Σ, π
-    P->>P: prove(V, π) => aggregate(doc-id, Σ)
-    B->>B: Σ = sign(sk, doc), π = makeproof(vcred)
-    B->>P: doc-id, Σ, π
-    P->>P: prove(V, π) => aggregate(doc-id, Σ)
-```
-
-The cipher message produced here is composed by:
-1. ZKproof ( `π` ) which is untreacable and it proves that the following signature is made by a legitimate owner of a signing key, anyone can verify this using the Issuer public verifier.
-2. Aggregated signature ( `Σ` ) can be a single signature or the sum of multiple signatures to be verified using every public signing key involved.
-
-## Verify signatures
-
-Once signatures are published, anyone can verify their authenticity.
-
-To verify signatures one needs to know:
-1. Public issuer verifier ( `V` )
-2. Public signing keys of Alice and Bob ( `pk1` and `pk2` )
-3. The document being signed ( `doc` )
-
-```mermaid
-sequenceDiagram
-    participant P as Public
-    participant N as Node
-    P->>N: V = Issuer verifier
-    P->>N: PK = pk1 + pk2
-    N->>N: verify_proof()
-```
+[Creative Commons — Attribution-NonCommercial-ShareAlike 4.0 International — CC BY-NC-SA 4](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
